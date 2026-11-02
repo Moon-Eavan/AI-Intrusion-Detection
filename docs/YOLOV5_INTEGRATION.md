@@ -74,7 +74,7 @@
 
 - 브라우저는 `localhost` 대신 **`127.0.0.1`**로 접속한다(`localhost`는 `ALLOWED_HOSTS`에 없어 400). 캡처에 꼭 `localhost`가 필요하면 `ALLOWED_HOSTS`에 추가한다.
 - Android 실기기로 PC 로컬 서버에 붙으려면 PC의 LAN IP를 `ALLOWED_HOSTS`와 `res/xml/network_security_config.xml`(cleartext 허용 도메인)에 추가해야 한다.
-- Cloud 서버 코드는 공통평가 01 배포본이다. Django 코드를 바꾸지 않으면 재배포 없이 YOLO가 바로 POST할 수 있다. 바꿨다면 PythonAnywhere에 반영 후 Web 탭에서 Reload.
+- Cloud 서버 코드는 공통평가 01 배포본이며, `settings.py`도 이전 버전(SECRET_KEY 하드코딩, `DEBUG = True`)이다. API 형식은 같으므로 기본 POST는 재배포 없이 가능하다. 단 ID 10 기능(모델·API 추가)은 배포가 필요하고, 그때 settings 전환도 함께 한다 (`IMPLEMENTATION_PLAN.md` Phase 7).
 
 ## 7. 검증 시나리오
 

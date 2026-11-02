@@ -42,10 +42,13 @@ PhotoBlogServer/
 
 로컬 전용(Git 제외): `venv/`, `db.sqlite3`, `media/`, `.coverage`, `htmlcov/`, `staticfiles/`
 
-환경변수:
+환경변수 (이 저장소 코드 기준):
 
 - `DJANGO_SECRET_KEY`: 없으면 개발용 키 사용, 단 `DEBUG=False`면 실행 중단
 - `DJANGO_DEBUG`: 기본 `True`, `'False'`면 꺼짐
+
+> **PythonAnywhere 배포본은 다르다.** Cloud 서버는 아직 이전 `settings.py`(SECRET_KEY 하드코딩, `DEBUG = True`)로 동작 중이다.
+> 환경변수 방식은 로컬에만 반영되어 있고, Cloud 전환은 `docs/IMPLEMENTATION_PLAN.md` Phase 7에서 한다.
 
 ## 3. PhotoViewer (Android, Java 11)
 
@@ -80,8 +83,9 @@ PhotoViewer/app/src/main/
 
 ```text
 YOLOv5/                      # git clone https://github.com/ultralytics/yolov5 YOLOv5
-├── detect.py                # upstream + ChangeDetection 연동 5곳 추가
+├── detect.py                # upstream + ChangeDetection 연동 5곳 추가 (+ ID 10 설정 필터·클립 버퍼 연결)
 ├── changedetection.py       # 신규: 0→1 변화 감지 + 이미지 저장 + POST
+├── (ID 10 모듈)             # 설정 polling, 클립 녹화·인코딩 — 파일 분리 방식은 구현 시 결정
 ├── .vscode/launch.json      # (선택) 강의자료 p.7
 ├── models/ utils/ data/     # upstream
 ├── requirements.txt         # upstream
@@ -103,6 +107,7 @@ Git 관련 주의:
 | `docs/ASSIGNMENT.md` | 평가표 ID 1~10 |
 | `docs/IMPLEMENTATION_PLAN.md` | Phase별 계획과 진행 상태 |
 | `docs/YOLOV5_INTEGRATION.md` | 강의 코드를 현재 API에 맞추는 방법 |
-| `docs/ANDROID_FEATURES.md` | Android 기존 기능, ID 10 편의 기능 |
+| `docs/EXTRA_FEATURES.md` | ID 10 기능 A(원격 감시 설정)·B(이벤트 클립 녹화) 설계 |
+| `docs/ANDROID_FEATURES.md` | Android 기존 기능, ID 10 Android 변경 범위 |
 | `docs/REPORT_CHECKLIST.md` | 평가 ID별 캡처·보고서 체크리스트 |
 | `docs/ch08.md` | Ch08 강의자료 정리본 |

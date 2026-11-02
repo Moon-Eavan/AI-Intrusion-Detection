@@ -7,7 +7,7 @@ YOLOv5로 카메라 영상에서 객체 출현을 감지하고, 검출 이미지
 - REST API: <https://hoynola.pythonanywhere.com/api_root/Post/>
 - Django 서버와 Android 앱은 공통평가 01 저장소 [Mobile-Webservice](https://github.com/Moon-Eavan/Mobile-Webservice)의 코드를 재사용합니다.
 
-> **진행 상태 (2026-11-02):** Django·Android 코드 복사 완료, YOLOv5 Edge Client 구현 예정.
+> **진행 상태 (2026-11-02):** Phase 0 완료 — Django 테스트 28개 통과, Android 빌드 및 에뮬레이터에서 Cloud 동기화 확인. 다음: YOLOv5 설치 및 기본 실행(Phase 1).
 > 단계별 상태는 [`docs/IMPLEMENTATION_PLAN.md`](docs/IMPLEMENTATION_PLAN.md)를 참고하세요.
 
 ## Architecture
@@ -118,12 +118,22 @@ PHOTOBLOG_HOST=https://hoynola.pythonanywhere.com python detect.py --source 0 # 
 | 5–6 | 블로그 등록 결과 (localhost) | `api_root`, 목록·이미지 |
 | 7 | 모바일 화면 확인 | YOLO 전송 이미지가 보이는 Android 화면 |
 | 8–9 | PythonAnywhere 동작 | Cloud `api_root`, 목록·이미지 |
-| 10 | 기획되지 않은 편의 기능 (최대 2개) | 미정 |
+| 10 | 기획되지 않은 편의 기능 (2개) | 원격 감시 설정, 이벤트 클립 녹화 + 보관 정책 |
+
+## 추가 기능 (ID 10)
+
+| 기능 | 내용 |
+| --- | --- |
+| **원격 감시 설정** | Android에서 감시 ON/OFF, 감시 대상 클래스(COCO 80개 중 선택), 신뢰도 임계값, 재등록 대기시간을 바꾸면 YOLO Edge가 polling으로 수 초 내 반영. 앱에서 Edge 온라인 상태 확인 |
+| **이벤트 클립 녹화 + 보관 정책** | 객체 출현 시 감지 전후 3초를 H.264 클립으로 만들어 게시물과 함께 업로드, 웹·Android에서 재생. 클립 총용량이 상한(기본 200MB)을 넘으면 오래된 클립부터 자동 삭제 |
+
+설계: [`docs/EXTRA_FEATURES.md`](docs/EXTRA_FEATURES.md) (구현 예정)
 
 상세 기준은 [`docs/ASSIGNMENT.md`](docs/ASSIGNMENT.md), 캡처 체크리스트는 [`docs/REPORT_CHECKLIST.md`](docs/REPORT_CHECKLIST.md).
 
 ## Security & Repository Notes
 
-- `SECRET_KEY`는 `DJANGO_SECRET_KEY`, 디버그는 `DJANGO_DEBUG` 환경변수로 설정합니다 (`DEBUG=False`에서 키가 없으면 실행 중단).
+- 이 저장소의 `settings.py`는 `SECRET_KEY`를 `DJANGO_SECRET_KEY`, 디버그를 `DJANGO_DEBUG` 환경변수로 설정합니다 (`DEBUG=False`에서 키가 없으면 실행 중단).
+  PythonAnywhere에서 동작 중인 서버는 아직 이전 버전 설정(하드코딩된 `SECRET_KEY`, `DEBUG = True`)이며, 다음 배포 때 환경변수 방식으로 전환할 예정입니다.
 - 게시물 API는 인증 없이 POST할 수 있습니다(강의 실습 범위). 강의자료의 JWT 예제 계정·토큰은 저장소에 넣지 않습니다.
 - Git 제외: `venv/`, `.env`, `db.sqlite3`, `media/`, `.coverage`, `htmlcov/`, `staticfiles/`, Android 빌드 산출물 (YOLOv5 `runs/`, `*.pt` 추가 예정)

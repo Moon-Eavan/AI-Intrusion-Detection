@@ -49,7 +49,7 @@ ROOT/
 - **ID 5·6**은 localhost, **ID 8·9**는 PythonAnywhere 화면으로 구분한다. 강의자료 p.12를 근거로 하므로
   Cloud 화면에도 YOLO가 등록한 게시물이 보이도록 하는 것이 안전하다.
 - **ID 10**: 최대 2개. 공통평가 01의 추가 기능(14-1~14-5) 번호·목록을 그대로 옮기지 않는다.
-  현재 선정된 기능 없음 → `docs/ANDROID_FEATURES.md` §4.
+  선정 기능: A 원격 감시 설정, B 이벤트 클립 녹화 + 보관 정책 → `docs/EXTRA_FEATURES.md`.
 
 ## 4. 강의자료 실습 동작 요약
 

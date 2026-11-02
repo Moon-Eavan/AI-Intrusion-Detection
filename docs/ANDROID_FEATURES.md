@@ -35,21 +35,15 @@
 - 신규 게시물 알림은 첫 실행 시 기존 게시물을 기준값으로 저장하고 알리지 않는다.
 - Android 13+는 알림 권한(`POST_NOTIFICATIONS`)을 요청한다.
 
-## 4. ID 10 — 기타 기획되지 않은 편의 기능 (최대 2개)
+## 4. ID 10 편의 기능에서 Android가 맡는 부분
 
-**현재 상태: 미정.** 사용자가 기능을 정하기 전까지 임의로 선정하거나 구현하지 않는다.
+ID 10 기능 정의 전체는 `docs/EXTRA_FEATURES.md`. Android 변경 범위만 요약한다.
 
-정해지면 기능마다 아래를 이 절에 기록한다.
+| 기능 | Android 변경 |
+| --- | --- |
+| A. 원격 감시 설정 | `SettingsActivity` 신규 (감시 ON/OFF, 대상 클래스, 신뢰도, 쿨다운 → `PATCH /api_root/config/`), `MainActivity`에 설정 버튼·Edge 온라인 표시 |
+| B. 이벤트 클립 녹화 | `PostItem`에 `clipUrl`·`clipExpired`, 목록 클립 표시, `DetailActivity`에서 `VideoView` 재생 |
 
-```text
-### 기능 N: <기능명>
-- 구분: 서버 / 클라이언트(Android) / Edge(YOLOv5)
-- 정의:
-- 동작 설명:
-- 구현 위치(파일):
-- 검증 방법:
-- 증빙 캡처:
-```
-
-- 서버와 클라이언트를 모두 구현해야 하는 기능은 보고서에 **별도 요구사항(행)** 으로 등록한다(보고서 ID 10 원문).
-- 기존 GET/POST·YOLO 등록·ID 7 동작이 깨지지 않는지 함께 확인한다.
+- Room DB(v2) 스키마는 바꾸지 않는다. 오프라인 캐시에는 클립 정보가 없다.
+- 게시물 키(`created_date`) 체계를 유지한다.
+- 기존 GET/POST·YOLO 게시물 표시(ID 7)가 깨지지 않는지 함께 확인한다.
