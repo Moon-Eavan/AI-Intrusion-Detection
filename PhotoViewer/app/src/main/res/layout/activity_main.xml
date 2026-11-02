@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/pb_surface"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <!-- ===== 상단: 앱 타이틀 + 검색 + 필터/정렬 ===== -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/pb_surface"
+        android:orientation="vertical"
+        android:paddingTop="@dimen/space_md"
+        android:paddingBottom="@dimen/space_md">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="@dimen/screen_padding"
+            android:paddingEnd="@dimen/space_sm">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/main_title"
+                    android:textColor="@color/pb_text"
+                    android:textSize="@dimen/text_app_title"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/main_subtitle"
+                    android:textColor="@color/pb_muted"
+                    android:textSize="@dimen/text_caption" />
+            </LinearLayout>
+
+            <!-- 개발/보고서 검증용: PeriodicWorkRequest(15분 주기)를 기다리지 않고
+                 PostSyncWorker를 즉시 1회 실행해 새 게시물 Notification 동작을 바로 확인할 수 있다.
+                 실제 자동 동기화 자체는 onCreate()에서 등록하는 PeriodicWorkRequest가 담당한다.
+                 주요 동작이 아니므로 상단 우측에 작은 텍스트 버튼으로 배치한다. -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnTestBackgroundSync"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="40dp"
+                android:onClick="onClickTestBackgroundSync"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:text="@string/action_test_background_sync"
+                android:textColor="@color/pb_muted"
+                android:textSize="12sp"
+                app:icon="@drawable/ic_schedule"
+                app:iconPadding="4dp"
+                app:iconSize="16dp"
+                app:iconTint="@color/pb_muted" />
+        </LinearLayout>
+
+        <!-- 둥근 검색창 (TextInputEditText는 EditText를 상속하므로 MainActivity의 EditText 바인딩 그대로 동작) -->
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/PhotoBlog.SearchInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/screen_padding"
+            android:layout_marginTop="@dimen/space_md"
+            android:layout_marginEnd="@dimen/screen_padding"
+            app:endIconMode="clear_text"
+            app:hintEnabled="false"
+            app:startIconDrawable="@drawable/ic_search"
+            app:startIconTint="@color/pb_muted">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/searchInput"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:hint="@string/search_hint"
+                android:imeOptions="actionDone"
+                android:inputType="text"
+                android:maxLines="1"
+                android:paddingTop="0dp"
+                android:paddingBottom="0dp"
+                android:textSize="15sp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- 필터(전체/즐겨찾기)와 정렬(최신순/오래된순)은 서로 독립적인 상태이므로 ChipGroup을 둘로 나눈다.
+             Chip은 Button을 상속하므로 MainActivity의 기존 Button 바인딩/클릭 리스너가 그대로 동작하고,
+             선택 표시는 ChipGroup(singleSelection)이 XML만으로 처리한다. -->
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_sm"
+            android:clipToPadding="false"
+            android:paddingStart="@dimen/screen_padding"
+            android:paddingEnd="@dimen/screen_padding"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/filterChipGroup"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:checkedChip="@id/btnFilterAll"
+                    app:chipSpacingHorizontal="@dimen/space_sm"
+                    app:selectionRequired="true"
+                    app:singleLine="true"
+                    app:singleSelection="true">
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/btnFilterAll"
+                        style="@style/PhotoBlog.Chip"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/filter_all" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/btnFilterFavorites"
+                        style="@style/PhotoBlog.Chip"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/filter_favorites" />
+                </com.google.android.material.chip.ChipGroup>
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="20dp"
+                    android:layout_marginStart="@dimen/space_md"
+                    android:layout_marginEnd="@dimen/space_md"
+                    android:background="@color/pb_border" />
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/sortChipGroup"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:chipSpacingHorizontal="@dimen/space_sm"
+                    app:selectionRequired="true"
+                    app:singleLine="true"
+                    app:singleSelection="true">
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/btnSortNewest"
+                        style="@style/PhotoBlog.Chip"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/sort_newest" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/btnSortOldest"
+                        style="@style/PhotoBlog.Chip"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/sort_oldest" />
+                </com.google.android.material.chip.ChipGroup>
+            </LinearLayout>
+        </HorizontalScrollView>
+    </LinearLayout>
+
+    <View style="@style/PhotoBlog.Divider" />
+
+    <!-- ===== 본문: 오프라인 배너 + 상태 + 게시물 목록 ===== -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@color/pb_background"
+        android:orientation="vertical">
+
+        <!-- 오프라인 캐시로 표시 중일 때만 보인다 (MainActivity.updateStatusText에서 isOfflineMode로 표시 여부만 결정). -->
+        <LinearLayout
+            android:id="@+id/offlineBanner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/screen_padding"
+            android:layout_marginTop="@dimen/space_md"
+            android:layout_marginEnd="@dimen/screen_padding"
+            android:background="@drawable/bg_offline_banner"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="@dimen/space_md"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_warning"
+                app:tint="@color/pb_warning_icon" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/space_md"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/offline_title"
+                    android:textColor="@color/pb_warning_text"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/offline_message"
+                    android:textColor="@color/pb_warning_text"
+                    android:textSize="@dimen/text_caption" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- 동기화/검색/필터 결과 상태 표시 (기존 textView id 유지) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="@dimen/screen_padding"
+            android:paddingTop="@dimen/space_md"
+            android:paddingEnd="@dimen/screen_padding"
+            android:paddingBottom="@dimen/space_xs">
+
+            <View
+                android:layout_width="6dp"
+                android:layout_height="6dp"
+                android:background="@drawable/bg_status_dot" />
+
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/space_sm"
+                android:text="@string/status_initial"
+                android:textColor="@color/pb_muted"
+                android:textSize="@dimen/text_status" />
+        </LinearLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:clipToPadding="false"
+            android:orientation="vertical"
+            android:paddingStart="@dimen/screen_padding"
+            android:paddingTop="@dimen/space_xs"
+            android:paddingEnd="@dimen/screen_padding"
+            android:paddingBottom="@dimen/space_lg"
+            tools:listitem="@layout/item_image" />
+    </LinearLayout>
+
+    <!-- ===== 하단 주요 Action ===== -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_bottom_bar"
+        android:orientation="horizontal"
+        android:paddingStart="@dimen/screen_padding"
+        android:paddingTop="@dimen/space_md"
+        android:paddingEnd="@dimen/screen_padding"
+        android:paddingBottom="@dimen/space_md">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_load"
+            style="@style/PhotoBlog.Button.Tonal"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="onClickDownload"
+            android:text="@string/action_sync"
+            app:icon="@drawable/ic_sync"
+            app:iconGravity="textStart" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_save"
+            style="@style/PhotoBlog.Button.Filled"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_md"
+            android:layout_weight="1"
+            android:onClick="onClickUpload"
+            android:text="@string/action_new_post"
+            app:icon="@drawable/ic_add"
+            app:iconGravity="textStart" />
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,0 +1,46 @@
+{% extends 'blog/base.html' %}
+
+{% block content %}
+    <section class="hero">
+        <div class="hero-text">
+            <h1>Photo Blog</h1>
+            <p>일상의 순간을 사진과 함께 기록하세요.</p>
+        </div>
+        <a class="btn btn-primary btn-lg" href="{% url 'post_new' %}">+ 새 게시물 작성</a>
+    </section>
+
+    <div class="list-toolbar">
+        <h2 class="section-title">전체 게시물 <span class="count">{{ posts|length }}</span></h2>
+        {# 웹 목록은 views.post_list에서 항상 -created_date 순으로 정렬되므로, 현재 정렬 기준을 표시만 한다. #}
+        <span class="sort-badge">최신순</span>
+    </div>
+
+    {% if posts %}
+        <div class="post-grid">
+            {% for post in posts %}
+                <a class="post-card" href="{% url 'post_detail' pk=post.pk %}">
+                    <div class="post-thumb">
+                        {% if post.image %}
+                            <img src="{{ post.image.url }}" alt="{{ post.title }}" loading="lazy">
+                        {% else %}
+                            <div class="thumb-placeholder">이미지 없음</div>
+                        {% endif %}
+                    </div>
+                    <div class="post-body">
+                        <h3 class="post-title">{{ post.title }}</h3>
+                        <p class="post-excerpt">{{ post.text|truncatechars:140 }}</p>
+                        <div class="post-meta">
+                            <span>{{ post.author }}</span>
+                            <time datetime="{{ post.created_date|date:'c' }}">{{ post.created_date|date:"Y.m.d" }}</time>
+                        </div>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <p>게시물이 없습니다.</p>
+            <a class="btn btn-primary" href="{% url 'post_new' %}">첫 게시물 작성하기</a>
+        </div>
+    {% endif %}
+{% endblock %}

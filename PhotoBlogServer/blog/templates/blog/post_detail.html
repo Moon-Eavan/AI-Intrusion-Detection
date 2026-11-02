@@ -1,0 +1,32 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}{{ post.title }} · Photo Blog{% endblock %}
+
+{% block content %}
+    <article class="detail">
+        <a class="back-link" href="{% url 'post_list' %}">← 목록으로 돌아가기</a>
+
+        <div class="detail-header">
+            <h1 class="detail-title">{{ post.title }}</h1>
+            <a class="btn btn-outline" href="{% url 'post_edit' pk=post.pk %}">수정</a>
+        </div>
+
+        <p class="detail-meta">
+            <span>{{ post.author }}</span>
+            <span class="dot" aria-hidden="true">·</span>
+            <time datetime="{{ post.created_date|date:'c' }}" title="작성일">{{ post.created_date|date:"Y.m.d H:i" }}</time>
+            {% if post.published_date %}
+                <span class="dot" aria-hidden="true">·</span>
+                <span title="게시일">게시 {{ post.published_date|date:"Y.m.d H:i" }}</span>
+            {% endif %}
+        </p>
+
+        {% if post.image %}
+            <figure class="detail-image">
+                <img src="{{ post.image.url }}" alt="{{ post.title }}">
+            </figure>
+        {% endif %}
+
+        <div class="detail-text">{{ post.text|linebreaks }}</div>
+    </article>
+{% endblock %}

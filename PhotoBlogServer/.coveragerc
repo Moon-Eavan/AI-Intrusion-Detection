@@ -1,0 +1,13 @@
+[run]
+source = blog
+omit =
+    */migrations/*
+    */tests.py
+    manage.py
+    venv/*
+
+[report]
+show_missing = True
+
+[html]
+directory = htmlcov

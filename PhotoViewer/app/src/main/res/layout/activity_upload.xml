@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/pb_surface"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical">
+
+    <!-- 상단 바: ← 새 게시물 작성 -->
+    <LinearLayout style="@style/PhotoBlog.TopBar">
+
+        <ImageButton
+            android:id="@+id/btnBack"
+            style="@style/PhotoBlog.IconButton"
+            android:contentDescription="@string/cd_back"
+            android:src="@drawable/ic_arrow_back" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_xs"
+            android:text="@string/upload_screen_title"
+            android:textColor="@color/pb_text"
+            android:textSize="@dimen/text_screen_title"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <View style="@style/PhotoBlog.Divider" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/space_xl">
+
+            <!-- 제목 -->
+            <TextView
+                style="@style/PhotoBlog.FieldLabel"
+                android:text="@string/label_title" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/PhotoBlog.TextInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:hintEnabled="false">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/hint_title"
+                    android:inputType="text"
+                    android:maxLines="1" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- 내용 -->
+            <TextView
+                style="@style/PhotoBlog.FieldLabel"
+                android:layout_marginTop="@dimen/space_xl"
+                android:text="@string/label_text" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/PhotoBlog.TextInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:hintEnabled="false">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="top|start"
+                    android:hint="@string/hint_text"
+                    android:inputType="textMultiLine"
+                    android:minLines="5" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- 이미지 미리보기: 선택 전에는 뒤의 placeholder가 보이고,
+                 Photo Picker로 선택하면 imagePreview(centerCrop)가 영역을 덮는다. -->
+            <TextView
+                style="@style/PhotoBlog.FieldLabel"
+                android:layout_marginTop="@dimen/space_xl"
+                android:text="@string/label_image" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/upload_preview_height"
+                app:cardBackgroundColor="@android:color/transparent"
+                app:cardCornerRadius="@dimen/radius_card"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp">
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/bg_image_placeholder" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:drawablePadding="@dimen/space_sm"
+                    android:gravity="center"
+                    android:text="@string/upload_preview_placeholder"
+                    android:textColor="@color/pb_hint"
+                    android:textSize="@dimen/text_preview"
+                    app:drawableTint="@color/pb_hint"
+                    app:drawableTopCompat="@drawable/ic_photo_library" />
+
+                <ImageView
+                    android:id="@+id/imagePreview"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:contentDescription="@string/cd_upload_preview"
+                    android:scaleType="centerCrop" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnPickImage"
+                style="@style/PhotoBlog.Button.Outlined"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_md"
+                android:text="@string/action_pick_image"
+                app:icon="@drawable/ic_photo_library"
+                app:iconGravity="textStart" />
+
+            <!-- 업로드 진행 표시 (UploadActivity가 VISIBLE/GONE만 전환) -->
+            <com.google.android.material.progressindicator.LinearProgressIndicator
+                android:id="@+id/progressBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_xxl"
+                android:indeterminate="true"
+                android:visibility="gone"
+                app:trackCornerRadius="4dp"
+                app:trackThickness="6dp" />
+
+            <TextView
+                android:id="@+id/statusText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_sm"
+                android:gravity="center_horizontal"
+                android:textColor="@color/pb_text_secondary"
+                android:textSize="@dimen/text_status" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnUpload"
+                style="@style/PhotoBlog.Button.Filled"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_md"
+                android:text="@string/action_upload"
+                app:icon="@drawable/ic_cloud_upload"
+                app:iconGravity="textStart" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCancel"
+                style="@style/PhotoBlog.Button.Text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_xs"
+                android:text="@string/action_cancel" />
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- Photo Blog 디자인 토큰 (Web style.css의 CSS 변수와 같은 팔레트) -->
+    <color name="pb_primary">#FF2563EB</color>
+    <color name="pb_primary_dark">#FF1D4ED8</color>
+    <color name="pb_primary_soft">#FFEFF4FF</color>
+    <color name="pb_on_primary">#FFFFFFFF</color>
+    <color name="pb_background">#FFF7F8FA</color>
+    <color name="pb_surface">#FFFFFFFF</color>
+    <color name="pb_surface_variant">#FFF1F3F6</color>
+    <color name="pb_text">#FF111827</color>
+    <color name="pb_text_secondary">#FF4B5563</color>
+    <color name="pb_muted">#FF6B7280</color>
+    <color name="pb_hint">#FF9CA3AF</color>
+    <color name="pb_border">#FFE5E7EB</color>
+    <color name="pb_input_stroke_default">#FFD1D5DB</color>
+    <color name="pb_favorite">#FFE11D48</color>
+    <color name="pb_error">#FFDC2626</color>
+
+    <!-- 오프라인 모드 배너 -->
+    <color name="pb_warning_bg">#FFFFF7E6</color>
+    <color name="pb_warning_border">#FFFCD9A0</color>
+    <color name="pb_warning_icon">#FFD97706</color>
+    <color name="pb_warning_text">#FF92400E</color>
+</resources>

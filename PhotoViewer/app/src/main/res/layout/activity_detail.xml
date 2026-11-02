@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/pb_surface"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical">
+
+    <!-- 상단 바: ← (뒤로) / ♡ (즐겨찾기 상태 표시) -->
+    <LinearLayout style="@style/PhotoBlog.TopBar">
+
+        <ImageButton
+            android:id="@+id/btnBack"
+            style="@style/PhotoBlog.IconButton"
+            android:contentDescription="@string/cd_back"
+            android:src="@drawable/ic_arrow_back" />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <!-- 목록에서 등록/해제한 즐겨찾기 상태를 그대로 보여주기만 한다 (읽기 전용). -->
+        <TextView
+            android:id="@+id/detailFavoriteIcon"
+            android:layout_width="@dimen/icon_button_size"
+            android:layout_height="@dimen/icon_button_size"
+            android:contentDescription="@string/cd_favorite"
+            android:gravity="center"
+            android:textColor="@color/pb_favorite"
+            android:textSize="@dimen/text_heart" />
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="@dimen/space_xl"
+            android:paddingTop="@dimen/space_xs"
+            android:paddingEnd="@dimen/space_xl"
+            android:paddingBottom="@dimen/space_xxl">
+
+            <TextView
+                android:id="@+id/detailTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:lineSpacingExtra="2dp"
+                android:textColor="@color/pb_text"
+                android:textSize="@dimen/text_detail_title"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/detailDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:textColor="@color/pb_muted"
+                android:textSize="13sp" />
+
+            <!-- 이미지 영역: 기존 ZoomableImageView(핀치 줌)를 그대로 사용하고 크기/모서리만 개선 -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/detail_image_height"
+                android:layout_marginTop="@dimen/space_xl"
+                app:cardBackgroundColor="@color/pb_surface_variant"
+                app:cardCornerRadius="@dimen/radius_card"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp">
+
+                <com.example.photoviewer.ZoomableImageView
+                    android:id="@+id/detailImage"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:contentDescription="@string/cd_post_image" />
+
+                <TextView
+                    android:id="@+id/noImageLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:drawablePadding="@dimen/space_sm"
+                    android:gravity="center"
+                    android:text="@string/no_image"
+                    android:textColor="@color/pb_hint"
+                    android:textSize="@dimen/text_preview"
+                    android:visibility="gone"
+                    app:drawableTint="@color/pb_hint"
+                    app:drawableTopCompat="@drawable/ic_image" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                android:id="@+id/detailText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_xxl"
+                android:lineSpacingMultiplier="1.5"
+                android:textColor="@color/pb_text"
+                android:textIsSelectable="true"
+                android:textSize="@dimen/text_body" />
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

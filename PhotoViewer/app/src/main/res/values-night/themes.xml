@@ -1,0 +1,4 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- 다크 모드에서도 Photo Blog의 밝은 디자인을 유지한다 (values/themes.xml과 동일한 Base 테마 사용).
+         별도 다크 팔레트를 두지 않으므로 여기서 Base.Theme.PhotoViewer를 재정의하지 않는다. -->
+</resources>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- spacing -->
+    <dimen name="space_xs">4dp</dimen>
+    <dimen name="space_sm">8dp</dimen>
+    <dimen name="space_md">12dp</dimen>
+    <dimen name="space_lg">16dp</dimen>
+    <dimen name="space_xl">20dp</dimen>
+    <dimen name="space_xxl">24dp</dimen>
+    <dimen name="screen_padding">16dp</dimen>
+
+    <!-- shape / elevation -->
+    <dimen name="radius_card">16dp</dimen>
+    <dimen name="radius_input">12dp</dimen>
+    <dimen name="radius_button">12dp</dimen>
+    <dimen name="card_elevation">2dp</dimen>
+
+    <!-- size -->
+    <dimen name="toolbar_height">56dp</dimen>
+    <dimen name="button_height">52dp</dimen>
+    <dimen name="item_image_height">190dp</dimen>
+    <dimen name="detail_image_height">360dp</dimen>
+    <dimen name="upload_preview_height">220dp</dimen>
+    <dimen name="icon_button_size">48dp</dimen>
+
+    <!-- text -->
+    <dimen name="text_app_title">22sp</dimen>
+    <dimen name="text_screen_title">18sp</dimen>
+    <dimen name="text_detail_title">24sp</dimen>
+    <dimen name="text_item_title">17sp</dimen>
+    <dimen name="text_body">16sp</dimen>
+    <dimen name="text_preview">14sp</dimen>
+    <dimen name="text_label">14sp</dimen>
+    <dimen name="text_caption">12sp</dimen>
+    <dimen name="text_status">13sp</dimen>
+    <dimen name="text_heart">24sp</dimen>
+</resources>

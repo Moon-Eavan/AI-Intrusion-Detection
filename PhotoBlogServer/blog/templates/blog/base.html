@@ -1,0 +1,39 @@
+{% load static %}<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Photo Blog{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'blog/css/style.css' %}">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a class="brand" href="{% url 'post_list' %}">
+                <span class="brand-mark" aria-hidden="true"></span>
+                Photo Blog
+            </a>
+            <nav class="nav">
+                <a class="nav-link" href="{% url 'post_list' %}">홈</a>
+                <a class="nav-link" href="{% url 'post_new' %}">새 게시물 작성</a>
+                {% if user.is_authenticated %}
+                    <span class="nav-user" title="로그인 사용자">
+                        <span class="avatar" aria-hidden="true">{{ user.username|first|upper }}</span>
+                        {{ user.username }}
+                    </span>
+                {% else %}
+                    <a class="nav-user nav-login" href="{% url 'admin:login' %}?next={{ request.path|urlencode }}">로그인</a>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
+    <main class="container main">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">Photo Blog · Django + Android PhotoViewer</div>
+    </footer>
+</body>
+</html>
