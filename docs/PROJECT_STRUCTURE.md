@@ -85,16 +85,16 @@ upstream `ultralytics/yolov5` `e128e595e13c39faecaf2d5ccd3a14daeb2ff40a` (2026-1
 
 ```text
 YOLOv5/
-├── detect.py                # upstream 원본 (Phase 2에서 ChangeDetection 연동 5곳 추가 예정)
-├── changedetection.py       # (예정) 0→1 변화 감지 + 이미지 저장 + POST
+├── detect.py                # upstream + ChangeDetection 연동 5곳 추가 (`# added (Ch08 p.11)`)
+├── changedetection.py       # 0→1 변화 감지 + 이미지 저장(320×240) + POST /api_root/Post/
 ├── (ID 10 모듈)             # (예정) 설정 polling, 클립 녹화·인코딩 — 파일 분리 방식은 구현 시 결정
-├── .vscode/launch.json      # (선택) 강의자료 p.7
+├── .vscode/launch.json      # 강의자료 p.7 디버깅 설정 (upstream `.gitignore`의 `*.json`으로 Git 제외, 로컬 전용)
 ├── models/ utils/ data/     # upstream
 ├── requirements.txt         # upstream
-├── .gitignore               # upstream: venv/, *.pt, runs/*, *.jpg 등 제외
+├── .gitignore               # upstream: venv/, *.pt, runs/*, *.jpg, *.json 등 제외
 ├── venv/                    # 로컬 전용 (Git 제외)
 ├── yolov5s.pt               # 첫 실행 시 자동 다운로드, 14MB (Git 제외)
-└── runs/detect/expN/        # 실행 결과·검출 이미지 (Git 제외)
+└── runs/detect/expN/        # 실행 결과 + detected/YYYY/M/D/*.jpg 전송 이미지 (Git 제외)
 ```
 
 - Python 3.9.5, torch 2.2.2, numpy 1.26.4, opencv-python 4.11.0.86 (Intel Mac은 torch 2.2.2가 마지막 → `numpy<2` 필요)

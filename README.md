@@ -7,7 +7,7 @@ YOLOv5로 카메라 영상에서 객체 출현을 감지하고, 검출 이미지
 - REST API: <https://hoynola.pythonanywhere.com/api_root/Post/>
 - Django 서버와 Android 앱은 공통평가 01 저장소 [Mobile-Webservice](https://github.com/Moon-Eavan/Mobile-Webservice)의 코드를 재사용합니다.
 
-> **진행 상태 (2026-11-02):** Phase 0 완료, Phase 1 진행 중 — YOLOv5 설치·샘플 이미지 검출 확인, 웹캠 기본 실행(ID 3) 대기.
+> **진행 상태 (2026-11-03):** Phase 0·1 완료, Phase 2 코드 완료 — `changedetection.py` 작성·`detect.py` 연동, 샘플 이미지로 Django 자동 등록 확인. 다음: ID 4 캡처 후 웹캠 로컬 연동(Phase 3).
 > 단계별 상태는 [`docs/IMPLEMENTATION_PLAN.md`](docs/IMPLEMENTATION_PLAN.md)를 참고하세요.
 
 ## Architecture
@@ -32,7 +32,7 @@ flowchart LR
 AI-Intrusion-Detection/
 ├── PhotoBlogServer/   # Django 4.2 + DRF 서버 (mysite / blog)
 ├── PhotoViewer/       # Android Java 클라이언트 (com.example.photoviewer)
-├── YOLOv5/            # Edge Client: upstream YOLOv5 (e128e59) + changedetection.py (구현 예정)
+├── YOLOv5/            # Edge Client: upstream YOLOv5 (e128e59) + changedetection.py
 ├── docs/              # 요구사항·계획·연동 가이드·체크리스트
 ├── tools/             # 공통평가 01 Raw Socket 요청 확인 도구
 └── 모바일웹서비스 프로젝트_공통평가 02_수행 결과 보고서.docx

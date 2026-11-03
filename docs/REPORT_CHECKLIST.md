@@ -23,12 +23,12 @@
 - [ ] URL 기재
 
 ### ID 3. YOLOv5 설치 및 실행 (p.6)
-- [ ] **수정 전 원본 `detect.py`** 를 `--source 0`으로 실행 (`cd YOLOv5 && source venv/bin/activate && python detect.py --source 0`, 종료는 `q` 또는 Ctrl+C)
-- [ ] 바운딩 박스·클래스명이 보이는 인식 화면 + 실행 터미널 캡처
+- [x] **수정 전 원본 `detect.py`** 를 `--source 0`으로 실행 (`cd YOLOv5 && source venv/bin/activate && python detect.py --source 0`, 종료는 `q` 또는 Ctrl+C)
+- [x] 바운딩 박스·클래스명이 보이는 인식 화면 + 실행 터미널 캡처 (2026-11-03, 사용자)
 
 ### ID 4. 검출기 코드 수정 (p.8–11)
-- [ ] VS Code에서 `changedetection.py` 캡처
-- [ ] VS Code에서 `detect.py` 추가 부분(5곳) 캡처
+- [ ] VS Code에서 `changedetection.py` 캡처 (파일 전체가 길면 `add`·`send` 부분 위주로 2장)
+- [ ] VS Code에서 `detect.py` 추가 부분(5곳) 캡처 — `added (Ch08 p.11)`로 검색하면 5곳이 바로 보임. VS Code 소스 제어(Git) 탭의 diff 화면도 유용
 
 ### ID 5. 로컬 `api_root` (p.12)
 - [ ] `http://127.0.0.1:8000/api_root/Post/`에 YOLO 등록 게시물(title = 검출 클래스, image URL) 표시

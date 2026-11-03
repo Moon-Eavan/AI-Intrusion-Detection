@@ -1,7 +1,7 @@
 # YOLOv5 ↔ Django ↔ Android 연동 가이드
 
 강의자료 원문 코드는 `docs/ch08.md`에 있다. 이 문서는 그 코드를 **현재 저장소의 Django API에 맞게 적용하는 방법**을 정리한 설계 노트다.
-`YOLOv5/`는 upstream `e128e59`(2026-11-01)로 설치됐고(Phase 1), 아래 연동 코드는 아직 구현 전이다.
+`YOLOv5/`는 upstream `e128e59`(2026-11-01)로 설치됐고(Phase 1), §3·§4의 강의 기반 연동은 Phase 2에서 구현했다(`YOLOv5/changedetection.py`, `detect.py` +7줄). ID 10 기능(§1의 설정·클립)은 아직 구현 전이다.
 
 ## 1. 데이터 흐름
 
@@ -41,7 +41,9 @@
 | `os.getcwd() / save_dir` | `save_dir`가 `Path`라서 동작은 함 | 그대로 두거나 `Path.cwd() / save_dir`로 명확히 |
 | `detect.py` 줄 번호 49/109/154/162/184 | 2022-06 버전 기준. 현재 upstream은 `@torch.no_grad()` 대신 `@smart_inference_mode()` 등 구조가 다름 | 줄 번호가 아니라 **코드 위치**(§4)로 찾아 삽입 |
 
-변경하지 않는 것: 0→1 변화 판정 로직(`add`), 320×240 축소, `detected/연/월/일/` 저장 구조, `title`/`text` 구성.
+변경하지 않는 것: 0→1 변화 판정 로직(`add`), 320×240 축소, `detected/연/월/일/` 저장 구조, `title`/`text` 구성, `os.getcwd() / save_dir` 경로 계산.
+
+Phase 2 구현에서 위 표의 처리를 모두 적용했다. 서버 통신 결과는 강의 코드처럼 `print(res)`(`<Response [201]>`)로 출력한다.
 강의자료 원본과 수정한 부분이 구분되도록 수정 줄에 짧은 주석을 남기면 ID 4 캡처 설명이 쉬워진다.
 
 ## 4. `detect.py` 삽입 위치

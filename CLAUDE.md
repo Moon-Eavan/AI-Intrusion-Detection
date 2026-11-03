@@ -8,9 +8,9 @@
 - `YOLOv5/`: Edge Client (upstream YOLOv5 + `changedetection.py`)
 - 루트 `.docx`: 수행 결과 보고서 (제출물, 수정은 사용자 몫)
 
-## 현재 상태 (2026-11-02)
+## 현재 상태 (2026-11-03)
 
-- Phase 0 완료(Django 테스트 28 OK, Android 빌드·에뮬레이터 Cloud 동기화 확인), Phase 1 진행 중(YOLOv5 `e128e59` 설치 완료, ID 3 웹캠 실행·캡처는 사용자), `origin = Moon-Eavan/AI-Intrusion-Detection` (First commit 있음)
+- Phase 0 완료(Django 테스트 28 OK, Android 빌드·에뮬레이터 Cloud 동기화 확인), Phase 1 완료(YOLOv5 `e128e59`, ID 3 캡처), Phase 2 코드 완료(`changedetection.py`, `detect.py` +7줄, ID 4 캡처는 사용자), `origin = Moon-Eavan/AI-Intrusion-Detection` (최신 커밋 `fa26e59`)
 - `ApiConfig.BASE_URL = https://hoynola.pythonanywhere.com` (로컬 에뮬레이터: 이 한 줄만 `http://10.0.2.2:8000`)
 - ID 10 편의 기능 확정: A 원격 감시 설정, B 이벤트 클립 녹화 + 보관 정책 (설계만 완료, `docs/EXTRA_FEATURES.md`). 이 외 기능을 임의로 추가하지 않는다
 - 진행 상황은 `docs/IMPLEMENTATION_PLAN.md`의 체크박스로 관리한다
