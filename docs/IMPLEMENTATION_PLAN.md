@@ -8,7 +8,7 @@ Phase 단위로 진행하고, 각 Phase의 확인 항목을 실제로 수행한 
 ## 현재 상태 (2026-11-02)
 
 - `PhotoBlogServer/`, `PhotoViewer/`: 공통평가 01 코드 복사, Phase 0 베이스라인 확인 완료.
-- `YOLOv5/`: 미생성.
+- `YOLOv5/`: upstream `e128e59` clone, `.git` 제거, venv 설치 완료. **ID 3 카메라 실행·캡처는 사용자 진행 대기.**
 - Git: `main` 브랜치, `8b49cf4 First commit`, `origin = git@github.com:Moon-Eavan/AI-Intrusion-Detection.git`
 - ID 10 기능 확정: A 원격 감시 설정, B 이벤트 클립 녹화 + 보관 정책 (`docs/EXTRA_FEATURES.md`, 설계 단계)
 
@@ -26,21 +26,26 @@ Phase 단위로 진행하고, 각 Phase의 확인 항목을 실제로 수행한 
 ## Phase 1 — YOLOv5 설치 및 무수정 실행 (ID 3)
 
 ```bash
-# 저장소 루트에서
-git clone https://github.com/ultralytics/yolov5 YOLOv5
+# 저장소 루트에서 (실제 수행한 명령)
+git clone --depth 1 https://github.com/ultralytics/yolov5 YOLOv5
+rm -rf YOLOv5/.git              # 사용자 승인. 루트 저장소에서 일반 폴더로 추적되게 함
 cd YOLOv5
 python3.9 -m venv venv          # 강의자료: Python 3.9에서 검증됨
-source venv/bin/activate
-pip install -r requirements.txt
-python detect.py --source 0
+venv/bin/pip install -r requirements.txt -c <(echo "numpy<2")   # Intel Mac: torch 2.2.2는 numpy 2와 비호환
+python detect.py --source 0     # ← ID 3 (사용자)
 ```
 
-- [ ] macOS 카메라 권한(터미널/VS Code) 허용
-- [ ] **수정 전 원본 `detect.py`** 실행, 바운딩 박스·클래스명 표시 확인
-- [ ] 실행 명령과 인식 화면 캡처 (ID 3)
-- [ ] 사용한 YOLOv5 커밋(`git -C YOLOv5 rev-parse --short HEAD`)과 Python 버전 기록
-- [ ] `YOLOv5/.git` 처리 결정 (그대로 두면 루트 저장소에서 gitlink로 잡혀 파일이 올라가지 않음) — 사용자 확인 후 처리
-- [ ] 루트 `.gitignore`에 `YOLOv5/runs/`, `*.pt` 추가 검토 (`venv/`는 이미 제외됨)
+- [x] clone: upstream `e128e595e13c39faecaf2d5ccd3a14daeb2ff40a` (2026-11-01). `YOLOv5/.git` 제거 → 루트 Git에서 일반 파일 143개(2.2MB)로 인식
+- [x] venv: Python 3.9.5 (Intel Mac x86_64), torch 2.2.2 / torchvision 0.17.2 / numpy 1.26.4 / opencv-python 4.11.0.86 / ultralytics 8.4.199
+- [x] 설치 검증: 원본 `detect.py --source data/images/bus.jpg` → `4 persons, 1 bus`, CPU 추론 약 177ms/프레임(약 5 FPS), `yolov5s.pt` 자동 다운로드
+- [x] Git 제외 확인: upstream `YOLOv5/.gitignore`가 `venv/`, `*.pt`, `runs/*`, `*.jpg`(샘플 제외)를 이미 제외 → 루트 `.gitignore` 추가 불필요
+- [x] `detect.py` 연동 위치 확인 (`docs/YOLOV5_INTEGRATION.md` §4에 이 버전 줄 번호 기록)
+- [ ] macOS 카메라 권한(터미널/VS Code) 허용 — 사용자
+  - 2026-11-03 첫 실행: `OpenCV: not authorized to capture video (status 0)` → `AssertionError: Failed to open 0`. 권한 미허용 상태의 정상 반응
+  - 해결: 시스템 설정 → 개인정보 보호 및 보안 → 카메라에서 실행한 터미널 앱 켜기 → **터미널 앱 완전 종료 후 재실행** → 다시 `python detect.py --source 0`
+- [ ] **수정 전 원본 `detect.py`** 를 `--source 0`으로 실행, 바운딩 박스·클래스명 표시 확인 — 사용자
+- [ ] 실행 명령과 인식 화면 캡처 (ID 3) — 사용자
+- [x] upstream `YOLOv5/CLAUDE.md`(→ `AGENTS.md` 링크)·`AGENTS.md` 삭제 (사용자 결정, 과제 지침과 충돌하는 Ultralytics 기여자용 지침)
 
 ## Phase 2 — 강의 기반 검출기 코드 수정 (ID 4)
 

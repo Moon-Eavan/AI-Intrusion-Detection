@@ -10,7 +10,7 @@
 
 ## 현재 상태 (2026-11-02)
 
-- Phase 0 완료(Django 테스트 28 OK, Android 빌드·에뮬레이터 Cloud 동기화 확인), `YOLOv5/` 미생성, `origin = Moon-Eavan/AI-Intrusion-Detection` (First commit 있음)
+- Phase 0 완료(Django 테스트 28 OK, Android 빌드·에뮬레이터 Cloud 동기화 확인), Phase 1 진행 중(YOLOv5 `e128e59` 설치 완료, ID 3 웹캠 실행·캡처는 사용자), `origin = Moon-Eavan/AI-Intrusion-Detection` (First commit 있음)
 - `ApiConfig.BASE_URL = https://hoynola.pythonanywhere.com` (로컬 에뮬레이터: 이 한 줄만 `http://10.0.2.2:8000`)
 - ID 10 편의 기능 확정: A 원격 감시 설정, B 이벤트 클립 녹화 + 보관 정책 (설계만 완료, `docs/EXTRA_FEATURES.md`). 이 외 기능을 임의로 추가하지 않는다
 - 진행 상황은 `docs/IMPLEMENTATION_PLAN.md`의 체크박스로 관리한다
@@ -43,7 +43,7 @@
 3. ID 3 캡처 전에는 `detect.py`를 수정하지 않는다.
 4. 강의자료 코드와 새로 보완한 코드를 구분한다(수정 줄에 짧은 주석).
 5. 서버 주소는 YOLO는 `PHOTOBLOG_HOST` 환경변수, Android는 `ApiConfig.BASE_URL` 한 곳에서만 관리한다.
-6. 비밀값·토큰·개인 촬영 이미지·`db.sqlite3`·`media/`·`runs/`·`*.pt`를 커밋하지 않는다. 기존 파일·`.git`을 임의로 삭제하지 않는다(`YOLOv5/.git` 처리는 사용자 확인).
+6. 비밀값·토큰·개인 촬영 이미지·`db.sqlite3`·`media/`·`runs/`·`*.pt`를 커밋하지 않는다. 기존 파일·`.git`을 임의로 삭제하지 않는다(`YOLOv5/.git`은 사용자 승인 후 제거함). upstream의 `YOLOv5/CLAUDE.md`·`AGENTS.md`(기여자용 AI 지침)는 사용자 승인 후 삭제함.
 7. 실행하지 않은 테스트는 "미실행", 공통평가 01 결과를 이번 과제 완료로 보고하지 않는다.
 8. 커밋·push·배포는 사용자가 요청할 때만 한다.
 9. **작업이 끝날 때마다 관련 문서를 모두 갱신한다.** 최소한 `IMPLEMENTATION_PLAN.md`(체크박스·결과·현재 상태), `CLAUDE.md` 현재 상태, `README.md` 진행 상태는 갱신한다. 해당되면 `REPORT_CHECKLIST.md`(캡처), `EXTRA_FEATURES.md`(설계 변경), `PROJECT_STRUCTURE.md`(파일 추가)도 갱신한다. 종료 보고에 갱신한 문서를 적는다.

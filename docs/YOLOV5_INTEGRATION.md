@@ -1,7 +1,7 @@
 # YOLOv5 ↔ Django ↔ Android 연동 가이드
 
 강의자료 원문 코드는 `docs/ch08.md`에 있다. 이 문서는 그 코드를 **현재 저장소의 Django API에 맞게 적용하는 방법**을 정리한 설계 노트다.
-아직 `YOLOv5/`는 생성되지 않았으므로 아래 내용은 구현 계획이며 실행 결과가 아니다.
+`YOLOv5/`는 upstream `e128e59`(2026-11-01)로 설치됐고(Phase 1), 아래 연동 코드는 아직 구현 전이다.
 
 ## 1. 데이터 흐름
 
@@ -44,16 +44,20 @@
 변경하지 않는 것: 0→1 변화 판정 로직(`add`), 320×240 축소, `detected/연/월/일/` 저장 구조, `title`/`text` 구성.
 강의자료 원본과 수정한 부분이 구분되도록 수정 줄에 짧은 주석을 남기면 ID 4 캡처 설명이 쉬워진다.
 
-## 4. `detect.py` 삽입 위치 (현재 upstream 기준으로 찾는 법)
+## 4. `detect.py` 삽입 위치
 
-| 강의자료 | 찾을 코드 | 추가 |
-| --- | --- | --- |
-| 49 | 상단 import 블록 | `from changedetection import ChangeDetection` |
-| 109 | `run()` 안 `names = model.names`(또는 `stride, names, pt = ...`) 이후, `model.warmup(...)` 이전 | `cd = ChangeDetection(names)` |
-| 154 | `for i, det in enumerate(pred):` 안, `if len(det):` 이전 | `detected = [0 for i in range(len(names))]` |
-| 162 | `for *xyxy, conf, cls in reversed(det):` 안 | `detected[int(cls)] = 1` |
-| 184 | `im0 = annotator.result()` 이후, `if view_img:` 이전 | `cd.add(names, detected, save_dir, im0)` |
+`e128e59` 버전 원본 `detect.py`에서 확인한 줄 번호 (수정 전 기준, 추가하면 뒤 줄 번호는 밀린다):
 
+| 강의자료 | 현재 버전 줄 | 찾을 코드 | 추가 |
+| --- | --- | --- | --- |
+| 49 | 49 부근 | `from models.common import DetectMultiBackend` 등 import 블록 | `from changedetection import ChangeDetection` |
+| 109 | 173 → 202 사이 | `stride, names, pt = model.stride, model.names, model.pt` 이후, `model.warmup(...)` 이전 | `cd = ChangeDetection(names)` |
+| 154 | 231 → 246 사이 | `for i, det in enumerate(pred):` 안, `if len(det):` 이전 | `detected = [0 for i in range(len(names))]` |
+| 162 | 256 | `for *xyxy, conf, cls in reversed(det):` 안 | `detected[int(cls)] = 1` |
+| 184 | 284 → 285 사이 | `im0 = annotator.result()` 이후, `if view_img:` 이전 | `cd.add(names, detected, save_dir, im0)` |
+
+- 데코레이터는 강의자료의 `@torch.no_grad()`가 아니라 `@smart_inference_mode()`(70줄)다.
+- `detect.py`가 실행 위치(ROOT)를 `sys.path`에 추가하므로 같은 폴더의 `changedetection.py`를 바로 import할 수 있다.
 - `im0`는 이 시점에 바운딩 박스가 그려진 이미지이므로 서버에 박스 포함 사진이 올라간다(강의자료 p.12와 동일).
 - `names`는 버전에 따라 list 또는 `{0: 'person', ...}` dict다. `len(names)`, `names[i]` 모두 동작한다.
 - 웹캠 1대 기준으로 설계되어 있다. 여러 소스를 동시에 쓰면 `result_prev`가 소스 간에 섞인다.

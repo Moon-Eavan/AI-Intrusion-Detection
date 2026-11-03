@@ -1,6 +1,6 @@
 # 프로젝트 구조
 
-`YOLOv5/`는 아직 없다(Phase 1에서 생성). 그 외 트리는 현재 저장소 기준이다.
+현재 저장소 기준이다. `YOLOv5/`의 ID 10 관련 파일은 구현 예정.
 
 ## 1. 루트
 
@@ -8,7 +8,7 @@
 AI-Intrusion-Detection/
 ├── PhotoBlogServer/        # Django Server (공통평가 01 재사용)
 ├── PhotoViewer/            # Android Client (공통평가 01 재사용)
-├── YOLOv5/                 # Edge Client (생성 예정)
+├── YOLOv5/                 # Edge Client (upstream YOLOv5 e128e59, .git 제거)
 ├── docs/                   # 과제 문서
 ├── tools/                  # 공통평가 01의 Raw Socket 요청 확인 도구 (이번 평가 항목 아님)
 ├── CLAUDE.md
@@ -79,24 +79,26 @@ PhotoViewer/app/src/main/
 | 에뮬레이터 → 로컬 Django | `http://10.0.2.2:8000` |
 | PythonAnywhere (현재 값) | `https://hoynola.pythonanywhere.com` |
 
-## 4. YOLOv5 (생성 예정)
+## 4. YOLOv5
+
+upstream `ultralytics/yolov5` `e128e595e13c39faecaf2d5ccd3a14daeb2ff40a` (2026-11-01)를 clone한 뒤 `.git`과 upstream 기여자용 AI 지침(`CLAUDE.md`, `AGENTS.md`)을 제거했다. 그 외 upstream 파일은 그대로다.
 
 ```text
-YOLOv5/                      # git clone https://github.com/ultralytics/yolov5 YOLOv5
-├── detect.py                # upstream + ChangeDetection 연동 5곳 추가 (+ ID 10 설정 필터·클립 버퍼 연결)
-├── changedetection.py       # 신규: 0→1 변화 감지 + 이미지 저장 + POST
-├── (ID 10 모듈)             # 설정 polling, 클립 녹화·인코딩 — 파일 분리 방식은 구현 시 결정
+YOLOv5/
+├── detect.py                # upstream 원본 (Phase 2에서 ChangeDetection 연동 5곳 추가 예정)
+├── changedetection.py       # (예정) 0→1 변화 감지 + 이미지 저장 + POST
+├── (ID 10 모듈)             # (예정) 설정 polling, 클립 녹화·인코딩 — 파일 분리 방식은 구현 시 결정
 ├── .vscode/launch.json      # (선택) 강의자료 p.7
 ├── models/ utils/ data/     # upstream
 ├── requirements.txt         # upstream
-└── runs/detect/expN/detected/YYYY/M/D/*.jpg   # 실행 시 생성 (Git 제외)
+├── .gitignore               # upstream: venv/, *.pt, runs/*, *.jpg 등 제외
+├── venv/                    # 로컬 전용 (Git 제외)
+├── yolov5s.pt               # 첫 실행 시 자동 다운로드, 14MB (Git 제외)
+└── runs/detect/expN/        # 실행 결과·검출 이미지 (Git 제외)
 ```
 
-Git 관련 주의:
-
-- clone하면 `YOLOv5/.git`이 생긴다. 그대로 두고 루트에서 `git add`하면 일반 폴더가 아니라 gitlink로 기록되어 GitHub에서 내용이 보이지 않는다. 처리 방식은 사용자 확인 후 결정한다.
-- 루트 `.gitignore`에 `YOLOv5/runs/`(카메라 촬영 이미지), `*.pt`(자동 다운로드되는 `yolov5s.pt` 등) 추가를 검토한다. `venv/`는 이미 제외되어 있다.
-- 카메라 촬영 이미지에 본인 외 인물이 찍히지 않도록 한다.
+- Python 3.9.5, torch 2.2.2, numpy 1.26.4, opencv-python 4.11.0.86 (Intel Mac은 torch 2.2.2가 마지막 → `numpy<2` 필요)
+- 카메라 촬영 이미지는 `runs/` 아래에 저장되어 커밋되지 않는다. 그래도 본인 외 인물이 찍히지 않도록 한다.
 
 ## 5. 문서
 

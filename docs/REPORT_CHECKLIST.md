@@ -23,7 +23,7 @@
 - [ ] URL 기재
 
 ### ID 3. YOLOv5 설치 및 실행 (p.6)
-- [ ] **수정 전 원본 `detect.py`** 를 `--source 0`으로 실행
+- [ ] **수정 전 원본 `detect.py`** 를 `--source 0`으로 실행 (`cd YOLOv5 && source venv/bin/activate && python detect.py --source 0`, 종료는 `q` 또는 Ctrl+C)
 - [ ] 바운딩 박스·클래스명이 보이는 인식 화면 + 실행 터미널 캡처
 
 ### ID 4. 검출기 코드 수정 (p.8–11)

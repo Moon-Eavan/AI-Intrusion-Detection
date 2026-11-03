@@ -7,7 +7,7 @@ YOLOv5로 카메라 영상에서 객체 출현을 감지하고, 검출 이미지
 - REST API: <https://hoynola.pythonanywhere.com/api_root/Post/>
 - Django 서버와 Android 앱은 공통평가 01 저장소 [Mobile-Webservice](https://github.com/Moon-Eavan/Mobile-Webservice)의 코드를 재사용합니다.
 
-> **진행 상태 (2026-11-02):** Phase 0 완료 — Django 테스트 28개 통과, Android 빌드 및 에뮬레이터에서 Cloud 동기화 확인. 다음: YOLOv5 설치 및 기본 실행(Phase 1).
+> **진행 상태 (2026-11-02):** Phase 0 완료, Phase 1 진행 중 — YOLOv5 설치·샘플 이미지 검출 확인, 웹캠 기본 실행(ID 3) 대기.
 > 단계별 상태는 [`docs/IMPLEMENTATION_PLAN.md`](docs/IMPLEMENTATION_PLAN.md)를 참고하세요.
 
 ## Architecture
@@ -32,7 +32,7 @@ flowchart LR
 AI-Intrusion-Detection/
 ├── PhotoBlogServer/   # Django 4.2 + DRF 서버 (mysite / blog)
 ├── PhotoViewer/       # Android Java 클라이언트 (com.example.photoviewer)
-├── YOLOv5/            # Edge Client: upstream YOLOv5 + changedetection.py (구현 예정)
+├── YOLOv5/            # Edge Client: upstream YOLOv5 (e128e59) + changedetection.py (구현 예정)
 ├── docs/              # 요구사항·계획·연동 가이드·체크리스트
 ├── tools/             # 공통평가 01 Raw Socket 요청 확인 도구
 └── 모바일웹서비스 프로젝트_공통평가 02_수행 결과 보고서.docx
@@ -82,13 +82,16 @@ python manage.py runserver
 ### 2. YOLOv5 Edge Client
 
 ```bash
-git clone https://github.com/ultralytics/yolov5 YOLOv5
+# 이 저장소에는 YOLOv5/가 이미 포함되어 있다 (upstream e128e59, .git 제거)
 cd YOLOv5
 python3.9 -m venv venv
 source venv/bin/activate
-pip install -r requirements.txt
+pip install -r requirements.txt -c <(echo "numpy<2")   # Intel Mac(torch 2.2.2)은 numpy 2 비호환
 python detect.py --source 0                     # 기본 검출 (카메라 필요)
 ```
+
+macOS에서 `not authorized to capture video` / `Failed to open 0`이 나오면 시스템 설정 → 개인정보 보호 및 보안 → 카메라에서 터미널 앱을 허용하고 터미널을 재시작합니다.
+첫 실행 시 `yolov5s.pt`(14MB)가 자동으로 내려받아지며, 결과는 `runs/detect/expN/`에 저장됩니다(둘 다 Git 제외).
 
 `changedetection.py` 연동 후에는 서버 주소를 환경변수로 지정해 실행합니다.
 
@@ -136,4 +139,4 @@ PHOTOBLOG_HOST=https://hoynola.pythonanywhere.com python detect.py --source 0 # 
 - 이 저장소의 `settings.py`는 `SECRET_KEY`를 `DJANGO_SECRET_KEY`, 디버그를 `DJANGO_DEBUG` 환경변수로 설정합니다 (`DEBUG=False`에서 키가 없으면 실행 중단).
   PythonAnywhere에서 동작 중인 서버는 아직 이전 버전 설정(하드코딩된 `SECRET_KEY`, `DEBUG = True`)이며, 다음 배포 때 환경변수 방식으로 전환할 예정입니다.
 - 게시물 API는 인증 없이 POST할 수 있습니다(강의 실습 범위). 강의자료의 JWT 예제 계정·토큰은 저장소에 넣지 않습니다.
-- Git 제외: `venv/`, `.env`, `db.sqlite3`, `media/`, `.coverage`, `htmlcov/`, `staticfiles/`, Android 빌드 산출물 (YOLOv5 `runs/`, `*.pt` 추가 예정)
+- Git 제외: `venv/`, `.env`, `db.sqlite3`, `media/`, `.coverage`, `htmlcov/`, `staticfiles/`, Android 빌드 산출물, YOLOv5 `venv/`·`*.pt`·`runs/*` (upstream `YOLOv5/.gitignore`)
