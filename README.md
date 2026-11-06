@@ -7,7 +7,7 @@ YOLOv5로 카메라 영상에서 객체 출현을 감지하고, 검출 이미지
 - REST API: <https://hoynola.pythonanywhere.com/api_root/Post/>
 - Django 서버와 Android 앱은 공통평가 01 저장소 [Mobile-Webservice](https://github.com/Moon-Eavan/Mobile-Webservice)의 코드를 재사용합니다.
 
-> **진행 상태 (2026-11-03):** Phase 0·1 완료, Phase 2 코드 완료 — `changedetection.py` 작성·`detect.py` 연동, 샘플 이미지로 Django 자동 등록 확인. 다음: ID 4 캡처 후 웹캠 로컬 연동(Phase 3).
+> **진행 상태 (2026-11-04):** Phase 0~2 완료 — YOLOv5 기본 검출(ID 3), `changedetection.py`·`detect.py` 연동(ID 4). Phase 3 완료 — 웹캠 → 로컬 Django 자동 등록 확인. 다음: 기능 A 원격 감시 설정(Phase 4).
 > 단계별 상태는 [`docs/IMPLEMENTATION_PLAN.md`](docs/IMPLEMENTATION_PLAN.md)를 참고하세요.
 
 ## Architecture
@@ -96,11 +96,11 @@ macOS에서 `not authorized to capture video` / `Failed to open 0`이 나오면 
 `changedetection.py` 연동 후에는 서버 주소를 환경변수로 지정해 실행합니다.
 
 ```bash
-PHOTOBLOG_HOST=http://127.0.0.1:8000 python detect.py --source 0              # 로컬
-PHOTOBLOG_HOST=https://hoynola.pythonanywhere.com python detect.py --source 0 # Cloud
+PHOTOBLOG_HOST=http://127.0.0.1:8000 python detect.py --source 0 --conf-thres 0.5              # 로컬
+PHOTOBLOG_HOST=https://hoynola.pythonanywhere.com python detect.py --source 0 --conf-thres 0.5 # Cloud
 ```
 
-연동 방법은 [`docs/YOLOV5_INTEGRATION.md`](docs/YOLOV5_INTEGRATION.md).
+기본 임계값 0.25에서는 배경 물체 오검출이 프레임마다 깜빡여 같은 클래스가 반복 등록되므로 `--conf-thres 0.5`를 사용합니다. 연동 방법은 [`docs/YOLOV5_INTEGRATION.md`](docs/YOLOV5_INTEGRATION.md).
 
 ### 3. Android Client
 

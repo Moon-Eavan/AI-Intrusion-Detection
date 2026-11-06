@@ -5,11 +5,11 @@ Phase 단위로 진행하고, 각 Phase의 확인 항목을 실제로 수행한 
 
 순서 원칙: 강의 기본 흐름(ID 3~4)을 먼저 확보 → ID 10 기능(서버·YOLO 변경 포함)을 붙임 → **ID 5~9 최종 캡처는 기능 구현 후 한 번에** 찍는다.
 
-## 현재 상태 (2026-11-03)
+## 현재 상태 (2026-11-04)
 
 - `PhotoBlogServer/`, `PhotoViewer/`: 공통평가 01 코드 복사, Phase 0 베이스라인 확인 완료.
-- `YOLOv5/`: upstream `e128e59` clone, `.git` 제거, venv 설치, 웹캠 기본 실행·ID 3 캡처 완료 (Phase 1). `changedetection.py` 작성·`detect.py` 5곳 수정 완료 (Phase 2 — ID 4 캡처는 사용자 대기)
-- Git: `main` 브랜치, 최신 `fa26e59 feat: set up YOLO and test webcam detection` (YOLOv5 일반 파일 141개로 추적), `origin = git@github.com:Moon-Eavan/AI-Intrusion-Detection.git`
+- `YOLOv5/`: upstream `e128e59` clone, `.git` 제거, venv 설치, 웹캠 기본 실행·ID 3 캡처 완료 (Phase 1). `changedetection.py` 작성·`detect.py` 5곳 수정, ID 4 캡처 완료 (Phase 2). 웹캠 → 로컬 Django 연동 확인 완료 (Phase 3, `--conf-thres 0.5`). 다음: Phase 4
+- Git: `main` 브랜치, 최신 `2444fbf feat: add change detection and send YOLO results to Django` (YOLOv5 일반 파일 141개로 추적), `origin = git@github.com:Moon-Eavan/AI-Intrusion-Detection.git`
 - ID 10 기능 확정: A 원격 감시 설정, B 이벤트 클립 녹화 + 보관 정책 (`docs/EXTRA_FEATURES.md`, 설계 단계)
 
 ## Phase 0 — 기존 코드 베이스라인 확인 ✅ (2026-11-02)
@@ -48,7 +48,7 @@ python detect.py --source 0     # ← ID 3 (사용자)
   - 웹캠 실행 결과 영상 `runs/detect/exp3·exp4/0.mp4`(얼굴 포함)는 `runs/*`로 Git 제외 확인
 - [x] upstream `YOLOv5/CLAUDE.md`(→ `AGENTS.md` 링크)·`AGENTS.md` 삭제 (사용자 결정, 과제 지침과 충돌하는 Ultralytics 기여자용 지침)
 
-## Phase 2 — 강의 기반 검출기 코드 수정 (ID 4) (2026-11-03, 코드 완료 / 캡처 대기)
+## Phase 2 — 강의 기반 검출기 코드 수정 (ID 4) ✅ (2026-11-03)
 
 `docs/YOLOV5_INTEGRATION.md` §3·§4 기준. 이 단계는 **강의자료 범위만** 구현했다.
 
@@ -61,14 +61,22 @@ python detect.py --source 0     # ← ID 3 (사용자)
   - 원본 샘플 `detect.py --source data/images`: `bus.jpg` → `title: bus, text: person, bus,` / `zidane.jpg` → `person` 유지라 `tie`만 등록. 업로드 이미지 320×240, 박스 포함, 이미지 URL 200
   - 서버 꺼짐: `ChangeDetection: 전송 실패 ...` 출력 후 검출 계속, 정상 종료
   - `published_date` 시간대 정상 (KST 18:29 → UTC 09:29)
-- [ ] VS Code에서 `changedetection.py`와 `detect.py` 추가 코드 캡처 (ID 4) — 사용자
+- [x] VS Code에서 `changedetection.py` 전체와 `detect.py` diff(변경 없는 영역 접기) 캡처 (ID 4) — 사용자 완료, 커밋 `2444fbf`
 
-## Phase 3 — 로컬 기본 연동 확인 (ID 5·6 사전 확인)
+## Phase 3 — 로컬 기본 연동 확인 (ID 5·6 사전 확인) ✅ (2026-11-04)
 
-- [ ] 로컬 `runserver` → `PHOTOBLOG_HOST=http://127.0.0.1:8000 python detect.py --source 0`
-- [ ] 객체 등장 시 `201`, 계속 있을 때 중복 없음, 재등장 시 새 등록
-- [ ] 서버를 끈 상태에서도 검출 루프가 멈추지 않음
-- [ ] 백업용으로 `api_root`, 목록 화면 캡처 (최종 캡처는 Phase 6)
+- [x] 로컬 `runserver`(127.0.0.1:8000) + 웹캠 `python detect.py --source 0` (2026-11-04, 기본값 `--conf-thres 0.25`)
+  - 결과: 약 75초 동안 POST 58건, 모두 `201`. 이미지 320×240·박스 포함 정상, 등장·재등장 시 등록 확인
+  - 테스트 게시물 58건과 이미지 파일은 사용자 승인 후 삭제 (기존 16건 유지, 삭제 전 DB는 scratchpad에 백업)
+  - **관측된 문제:** 배경 물체 오검출(옷장 문 → `refrigerator 0.30`, `chair`, `tv`)이 임계값 0.25 근처에서 프레임마다 깜빡여(1→0→1) 같은 클래스가 반복 등록됨. 강의 로직(직전 프레임과만 비교)의 한계. 기능 A의 신뢰도 임계값·대상 클래스·재등록 대기시간으로 보완 예정
+- [x] 객체 등장 시 `201`, 계속 있을 때 중복 없음, 재등장 시 새 등록 — 3차 실행에서 충족
+  - 2차 실행(2026-11-04, `--conf-thres 0.5` 의도): 약 32초에 27건. 그러나 업로드 이미지의 신뢰도가 0.26~0.43 → **옵션이 적용되지 않은 실행으로 판단**. 샘플 이미지로 옵션 동작은 확인(`zidane.jpg`: 0.25 → tie 2개, 0.5 → tie 1개). 터미널 첫 줄 `conf_thres=` 확인 후 재실행 필요
+  - **3차 실행(2026-11-04): `python detect.py --source 0 --conf-thres 0.5`** — Claude가 백그라운드로 실행(터미널 카메라 권한 공유), 사용자는 카메라 앞 동작만 수행. 시작 로그 `conf_thres=0.5` 확인
+  - 결과: 약 359프레임(약 50초) 동안 POST 4건, 모두 `201`, 전송 실패 0 → 시나리오와 정확히 일치
+    `person`(최초 등장) → `person`(퇴장 후 재등장) → `cell phone`(휴대폰 제시, `cell phone 0.72`) → `person`(재등장). 머무는 동안 중복 없음, 옷장 오검출 사라짐
+  - **이후 웹캠 실행은 `--conf-thres 0.5`를 표준으로 사용**한다 (YOLOv5 기본 옵션, 코드 변경 없음)
+- [x] 서버를 끈 상태에서도 검출 루프가 멈추지 않음 (Phase 2 샘플 이미지 테스트에서 확인: `전송 실패` 출력 후 계속)
+- [ ] (선택) 백업용으로 `api_root`, 목록 화면 캡처 — 현재 로컬 DB에 3차 실행 게시물 4건 (최종 캡처는 Phase 6)
 
 ## Phase 4 — 기능 A: 원격 감시 설정 (ID 10)
 
