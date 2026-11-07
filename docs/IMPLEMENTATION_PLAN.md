@@ -8,8 +8,8 @@ Phase 단위로 진행하고, 각 Phase의 확인 항목을 실제로 수행한 
 ## 현재 상태 (2026-11-07)
 
 - `PhotoBlogServer/`, `PhotoViewer/`: 공통평가 01 코드 복사, Phase 0 베이스라인 확인 완료.
-- `YOLOv5/`: upstream `e128e59` clone, `.git` 제거, venv 설치, 웹캠 기본 실행·ID 3 캡처 완료 (Phase 1). `changedetection.py` 작성·`detect.py` 5곳 수정, ID 4 캡처 완료 (Phase 2). 웹캠 → 로컬 Django 연동 확인 완료 (Phase 3, `--conf-thres 0.5`). 기능 A 구현·웹캠 증빙 완료 (Phase 4). 기능 B 구현·웹캠 증빙 완료 (Phase 5). 다음: Phase 6
-- Git: `main` 브랜치, 최신 `77ee684 feat: add remote monitoring config (ID 10 feature A)` (YOLOv5 일반 파일 141개로 추적), `origin = git@github.com:Moon-Eavan/AI-Intrusion-Detection.git`
+- `YOLOv5/`: upstream `e128e59` clone, `.git` 제거, venv 설치, 웹캠 기본 실행·ID 3 캡처 완료 (Phase 1). `changedetection.py` 작성·`detect.py` 5곳 수정, ID 4 캡처 완료 (Phase 2). 웹캠 → 로컬 Django 연동 확인 완료 (Phase 3, `--conf-thres 0.5`). 기능 A 구현·웹캠 증빙 완료 (Phase 4). 기능 B 구현·웹캠 증빙 완료 (Phase 5). Phase 6 로컬 최종 게시물 생성·ID 7·회귀 확인 완료, ID 5·6 브라우저 캡처는 사용자
+- Git: `main` 브랜치, 최신 `e5bd833 fix: remove trailing comma from detection post text` (YOLOv5 일반 파일 141개로 추적), `origin = git@github.com:Moon-Eavan/AI-Intrusion-Detection.git`
 - ID 10 기능 확정: A 원격 감시 설정(구현됨), B 이벤트 클립 녹화 + 보관 정책(구현됨) — `docs/EXTRA_FEATURES.md`
 - **`ApiConfig.BASE_URL`이 로컬 테스트용 `http://10.0.2.2:8000` 상태.** Phase 5(클립 재생)·Phase 6(ID 7)도 로컬이 필요해 유지하고, Phase 7 전에 Cloud로 되돌린다
 
@@ -115,13 +115,18 @@ python detect.py --source 0     # ← ID 3 (사용자)
 - [x] 증빙 파일: `../AI-Intrusion-Detection-docs/captures/phase5/` (YOLO 로그 10-4, API 응답 10-5, 앱 화면 4장 10-6). 웹 캡처 10-5는 사용자
 - [x] (Phase 5 커밋 후, 사용자 요청) 게시물 `text` 끝 쉼표 제거: `"person, "` → `"person"`, 녹화 중 병합은 `", "`로 연결. 테스트 영상으로 `'person, bus, tie'`, `'person, bus'` 확인
 
-## Phase 6 — 로컬 최종 캡처 (ID 5·6·7)
+## Phase 6 — 로컬 최종 캡처 (ID 5·6·7) (2026-11-07)
 
-- [ ] YOLO 실행해 새 검출 게시물 생성
-- [ ] `http://127.0.0.1:8000/api_root/Post/` 캡처 (ID 5)
-- [ ] `http://127.0.0.1:8000/` 목록·이미지 캡처 (ID 6)
-- [ ] Android(`BASE_URL = http://10.0.2.2:8000`으로 바꿔 재빌드) 동기화 → **최신순** 선택 후 YOLO 게시물 캡처 (ID 7)
-- [ ] 기존 Android 기능 회귀 확인 (업로드, 검색·정렬·즐겨찾기·캐시·알림)
+- [x] YOLO 실행해 새 검출 게시물 생성 (웹캠, 대상 person·cell phone, 대기 10초): 8건(`person` 7, `cell phone` 1), 모두 클립 포함, `text` 끝 쉼표 없는 새 형식. 로컬 DB 50건. 이후 감시 설정 기본값 복원
+- [ ] `http://127.0.0.1:8000/api_root/Post/` 캡처 (ID 5) — 사용자 (목록 끝부분에 2026-11-07 06:58~06:59 UTC 게시물)
+- [ ] `http://127.0.0.1:8000/` 목록·이미지 캡처 (ID 6) — 사용자 (맨 위 8건)
+- [x] Android(`BASE_URL = http://10.0.2.2:8000`, Phase 5 빌드) 동기화 → **최신순** → YOLO 게시물·클립 배지 캡처 (ID 7) — `../AI-Intrusion-Detection-docs/captures/phase6/ID7_앱_YOLO게시물_최신순.png`
+- [x] 기존 Android 기능 회귀 확인 (에뮬레이터, adb 조작)
+  - 동기화 50건 / 검색 "cell" → 14건 / 오래된순(2026-10-08 글)·최신순(오늘 YOLO 글) / 즐겨찾기 등록 → 필터 1개 → 해제
+  - 업로드: Photo Picker로 사진 선택 + 제목·내용 → 서버에 이미지 포함 등록, 자동 재동기화 51건 → 테스트 게시물 삭제(파일도 삭제)
+  - 백그라운드 테스트 버튼 → 알림 "새 게시물 8개가 있습니다."
+  - 오프라인 캐시: Phase 5에서 일시 연결 실패 시 캐시 37건 표시 확인
+  - 조작 중 키보드가 닫힌 상태에서 BACK을 보내 앱이 한 번 종료됨(테스트 조작 실수, 앱 문제 아님)
 
 ## Phase 7 — PythonAnywhere (ID 8·9)
 

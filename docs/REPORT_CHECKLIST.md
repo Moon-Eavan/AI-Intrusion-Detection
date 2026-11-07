@@ -39,8 +39,8 @@
 - [ ] 주소창 포함 캡처
 
 ### ID 7. 모바일 화면
-- [ ] Android 동기화 후 **YOLO가 전송한 이미지**(ID 5·6 또는 ID 8·9와 같은 게시물) 표시
-- [ ] 에뮬레이터/실기기 캡처 (수동 업로드 사진으로 대체 금지). 기본 목록은 오래된 순이므로 **최신순**을 눌러 YOLO 게시물이 위에 보이게 한다
+- [x] Android 동기화 후 **YOLO가 전송한 이미지**(ID 5·6 또는 ID 8·9와 같은 게시물) 표시 (2026-11-07, 로컬)
+- [x] 에뮬레이터/실기기 캡처 — `../AI-Intrusion-Detection-docs/captures/phase6/ID7_앱_YOLO게시물_최신순.png` (보고서에 넣으면 끝) (수동 업로드 사진으로 대체 금지). 기본 목록은 오래된 순이므로 **최신순**을 눌러 YOLO 게시물이 위에 보이게 한다
 
 ### ID 8. PythonAnywhere `api_root`
 - [ ] `https://hoynola.pythonanywhere.com/api_root/Post/`에 YOLO 게시물 표시

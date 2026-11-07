@@ -7,7 +7,7 @@ YOLOv5로 카메라 영상에서 객체 출현을 감지하고, 검출 이미지
 - REST API: <https://hoynola.pythonanywhere.com/api_root/Post/>
 - Django 서버와 Android 앱은 공통평가 01 저장소 [Mobile-Webservice](https://github.com/Moon-Eavan/Mobile-Webservice)의 코드를 재사용합니다.
 
-> **진행 상태 (2026-11-07):** Phase 0~3 완료 — YOLOv5 기본 검출(ID 3), `changedetection.py`·`detect.py` 연동(ID 4), 웹캠 → 로컬 Django 자동 등록 확인. Phase 4·5 완료 — ID 10 기능 A 원격 감시 설정, 기능 B 이벤트 클립 녹화 구현·웹캠 증빙. 다음: 로컬 최종 캡처(Phase 6).
+> **진행 상태 (2026-11-07):** Phase 0~3 완료 — YOLOv5 기본 검출(ID 3), `changedetection.py`·`detect.py` 연동(ID 4), 웹캠 → 로컬 Django 자동 등록 확인. Phase 4·5 완료 — ID 10 기능 A 원격 감시 설정, 기능 B 이벤트 클립 녹화 구현·웹캠 증빙. Phase 6 — 로컬 최종 게시물 생성, Android 화면(ID 7)·기존 기능 회귀 확인 완료. 다음: PythonAnywhere 배포(Phase 7).
 > 단계별 상태는 [`docs/IMPLEMENTATION_PLAN.md`](docs/IMPLEMENTATION_PLAN.md)를 참고하세요.
 
 ## Architecture
