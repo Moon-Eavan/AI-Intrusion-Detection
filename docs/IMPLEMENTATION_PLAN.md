@@ -113,6 +113,7 @@ python detect.py --source 0     # ← ID 3 (사용자)
   - 앱 동기화가 한 번 `Failed to connect`(일시적)로 오프라인 캐시 표시 → 재시도 시 정상
 - [x] 증빙 후 서버를 기본 상한(200MB)으로 재시작, 감시 설정 기본값 복원
 - [x] 증빙 파일: `../AI-Intrusion-Detection-docs/captures/phase5/` (YOLO 로그 10-4, API 응답 10-5, 앱 화면 4장 10-6). 웹 캡처 10-5는 사용자
+- [x] (Phase 5 커밋 후, 사용자 요청) 게시물 `text` 끝 쉼표 제거: `"person, "` → `"person"`, 녹화 중 병합은 `", "`로 연결. 테스트 영상으로 `'person, bus, tie'`, `'person, bus'` 확인
 
 ## Phase 6 — 로컬 최종 캡처 (ID 5·6·7)
 

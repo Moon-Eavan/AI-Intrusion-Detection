@@ -107,7 +107,7 @@ Android 앱에서 YOLO Edge의 감시 동작(ON/OFF, 감시 대상 클래스, �
 - 별도 녹화 프로그램 없이 `detect.py`가 처리하는 프레임 `im0`(박스가 그려진 프레임)를 사용
 - `collections.deque(maxlen=N)` ring buffer에 최근 3초 프레임 보관 (320×240로 축소 후 `copy()`)
 - 0→1 감지 시 "녹화 중" 상태로 전환, 이후 3초 프레임 추가 수집
-- 녹화 중 새로 나타난 클래스는 진행 중인 이벤트의 `text`에 합친다(별도 이벤트로 만들지 않음)
+- 녹화 중 새로 나타난 클래스는 진행 중인 이벤트의 `text`에 `", "`로 이어 붙인다(별도 이벤트로 만들지 않음, 예: `person, bus, tie`)
 - 수집이 끝나면 **백그라운드 스레드**에서 인코딩 + 업로드 (검출 루프가 멈추지 않게)
 - 인코딩: `imageio` + `imageio-ffmpeg` (`codec="libx264"`, `pixelformat="yuv420p"`), BGR→RGB 변환
   - `cv2.VideoWriter`의 `mp4v`는 브라우저에서 재생되지 않아 사용하지 않음

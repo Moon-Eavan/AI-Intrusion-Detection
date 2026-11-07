@@ -56,9 +56,10 @@ class ChangeDetection:
             i += 1
         self.result_prev = detected_current[:]  # 객체 검출 상태 저장
         if change_flag == 1:
+            self.text = self.text[:-2]  # 수정: 마지막 클래스 뒤의 ", " 제거 ("person, cell phone")
             if self.recorder.recording:
                 # 추가(ID 10 기능 B): 녹화 중 새로 나타난 클래스는 진행 중인 이벤트에 합친다
-                self.recorder.event['data']['text'] += self.text
+                self.recorder.event['data']['text'] += ', ' + self.text
                 print('ChangeDetection: 녹화 중인 이벤트에 추가 -', self.text)
             else:
                 self.send(save_dir, image)
