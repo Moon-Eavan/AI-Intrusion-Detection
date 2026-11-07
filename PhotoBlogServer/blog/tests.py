@@ -1,3 +1,4 @@
+import os
 import tempfile
 from datetime import timedelta
 
@@ -401,3 +402,99 @@ class MonitorConfigApiTests(APITestCase):
         response = self.client.get(self.CONFIG_URL)
         self.assertFalse(response.data['edge_online'])
         self.assertGreaterEqual(response.data['edge_seen_sec'], 16)
+
+
+def make_test_clip(name='clip.mp4', size=1000):
+    # 보관 정책은 파일 크기만 보므로 실제 영상이 아니어도 된다
+    return SimpleUploadedFile(name, b'\0' * size, content_type='video/mp4')
+
+
+@override_settings(MEDIA_ROOT=TEST_MEDIA_ROOT)
+class PostClipTests(APITestCase):
+    """clip 업로드, 파일 정리 시그널, 용량 기준 보관 정책 (ID 10 기능 B)."""
+
+    POST_LIST_URL = '/api_root/Post/'
+
+    def upload(self, title='person', clip=None):
+        data = {'title': title, 'text': title + ', ', 'image': make_test_png()}
+        if clip is not None:
+            data['clip'] = clip
+        return self.client.post(self.POST_LIST_URL, data, format='multipart')
+
+    def test_post_with_clip_returns_clip_url(self):
+        response = self.upload(clip=make_test_clip())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertIn('/media/blog_clip/', response.data['clip'])
+        self.assertTrue(response.data['clip'].endswith('.mp4'))
+        self.assertFalse(response.data['clip_expired'])
+
+    def test_post_without_clip_still_works(self):
+        response = self.upload()
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertIsNone(response.data['clip'])
+        self.assertFalse(response.data['clip_expired'])
+
+    def test_non_mp4_clip_returns_400(self):
+        response = self.upload(clip=make_test_clip(name='clip.avi'))
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_clip_expired_is_read_only(self):
+        response = self.client.post(self.POST_LIST_URL, {
+            'title': 't', 'text': 't', 'clip_expired': True,
+        }, format='multipart')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertFalse(response.data['clip_expired'])
+
+    @override_settings(CLIP_STORAGE_LIMIT_MB=2500 / (1024 * 1024))
+    def test_storage_limit_expires_oldest_clips_first(self):
+        for i in range(4):
+            self.upload(title='event%d' % i, clip=make_test_clip(size=1000))
+        posts = list(Post.objects.order_by('created_date'))
+        # 1000바이트 4개 = 4000 > 2500 → 오래된 2개 만료, 최근 2개(2000) 유지
+        self.assertEqual([p.clip_expired for p in posts], [True, True, False, False])
+        self.assertEqual([bool(p.clip) for p in posts], [False, False, True, True])
+        # 게시물·썸네일 이미지는 남는다
+        self.assertEqual(Post.objects.count(), 4)
+        self.assertTrue(all(p.image for p in posts))
+
+    @override_settings(CLIP_STORAGE_LIMIT_MB=2500 / (1024 * 1024))
+    def test_storage_limit_deletes_expired_clip_file(self):
+        self.upload(title='old', clip=make_test_clip(size=1000))
+        old_path = Post.objects.get(title='old').clip.path
+        self.upload(title='new1', clip=make_test_clip(size=1000))
+        self.upload(title='new2', clip=make_test_clip(size=1000))
+        self.assertFalse(os.path.exists(old_path))
+
+    def test_storage_under_limit_keeps_all_clips(self):
+        for i in range(3):
+            self.upload(title='event%d' % i, clip=make_test_clip())
+        self.assertFalse(Post.objects.filter(clip_expired=True).exists())
+
+    def test_deleting_post_removes_image_and_clip_files(self):
+        self.upload(clip=make_test_clip())
+        post = Post.objects.get()
+        image_path, clip_path = post.image.path, post.clip.path
+        self.assertTrue(os.path.exists(image_path) and os.path.exists(clip_path))
+        post.delete()
+        self.assertFalse(os.path.exists(image_path))
+        self.assertFalse(os.path.exists(clip_path))
+
+    def test_web_detail_shows_video_or_expired_message(self):
+        self.upload(title='with_clip', clip=make_test_clip())
+        post = Post.objects.get(title='with_clip')
+        response = self.client.get(reverse('post_detail', kwargs={'pk': post.pk}))
+        self.assertContains(response, '<video')
+        self.assertContains(response, post.clip.url)
+
+        post.clip.delete(save=False)
+        post.clip = ''
+        post.clip_expired = True
+        post.save()
+        response = self.client.get(reverse('post_detail', kwargs={'pk': post.pk}))
+        self.assertNotContains(response, '<video')
+        self.assertContains(response, '클립 만료됨')
+
+    def test_web_list_shows_clip_badge(self):
+        self.upload(title='with_clip', clip=make_test_clip())
+        response = self.client.get(reverse('post_list'))
+        self.assertContains(response, '▶ 클립')

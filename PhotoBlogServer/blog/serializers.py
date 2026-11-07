@@ -9,10 +9,11 @@ from .models import MonitorConfig, Post
 class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
-        fields = ['author', 'title', 'text', 'created_date', 'published_date', 'image']
+        fields = ['author', 'title', 'text', 'created_date', 'published_date', 'image', 'clip', 'clip_expired']
         # author는 클라이언트가 직접 지정하지 않는다 (BlogImages.perform_create에서 서버가 결정).
         # 특정 DB의 PK 값에 의존하지 않기 위함이며, GET 응답에는 계속 포함된다.
-        read_only_fields = ['author']
+        # clip_expired는 보관 정책(clip_storage)만 바꾼다
+        read_only_fields = ['author', 'clip_expired']
 
 
 # Edge가 5초마다 heartbeat를 보내므로 15초(3회 누락) 안에 기록이 있으면 온라인으로 본다

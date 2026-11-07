@@ -6,6 +6,7 @@ from rest_framework import generics, viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from .clip_storage import enforce_clip_storage_limit
 from .forms import PostForm
 from .models import MonitorConfig, Post
 from .serializers import MonitorConfigSerializer, PostSerializer, validate_class_list
@@ -24,6 +25,9 @@ class BlogImages(viewsets.ModelViewSet):
             serializer.save(author=self.request.user)
         else:
             serializer.save(author=self._resolve_default_author())
+        # ID 10 기능 B: 클립이 추가되면 총용량 상한을 확인해 오래된 클립부터 정리
+        if serializer.instance.clip:
+            enforce_clip_storage_limit()
 
     @staticmethod
     def _resolve_default_author():

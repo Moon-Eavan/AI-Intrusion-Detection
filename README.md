@@ -7,7 +7,7 @@ YOLOv5로 카메라 영상에서 객체 출현을 감지하고, 검출 이미지
 - REST API: <https://hoynola.pythonanywhere.com/api_root/Post/>
 - Django 서버와 Android 앱은 공통평가 01 저장소 [Mobile-Webservice](https://github.com/Moon-Eavan/Mobile-Webservice)의 코드를 재사용합니다.
 
-> **진행 상태 (2026-11-07):** Phase 0~3 완료 — YOLOv5 기본 검출(ID 3), `changedetection.py`·`detect.py` 연동(ID 4), 웹캠 → 로컬 Django 자동 등록 확인. Phase 4 완료 — 기능 A 원격 감시 설정 구현·웹캠 증빙. 다음: 기능 B 이벤트 클립 녹화(Phase 5).
+> **진행 상태 (2026-11-07):** Phase 0~3 완료 — YOLOv5 기본 검출(ID 3), `changedetection.py`·`detect.py` 연동(ID 4), 웹캠 → 로컬 Django 자동 등록 확인. Phase 4·5 완료 — ID 10 기능 A 원격 감시 설정, 기능 B 이벤트 클립 녹화 구현·웹캠 증빙. 다음: 로컬 최종 캡처(Phase 6).
 > 단계별 상태는 [`docs/IMPLEMENTATION_PLAN.md`](docs/IMPLEMENTATION_PLAN.md)를 참고하세요.
 
 ## Architecture
@@ -53,7 +53,7 @@ AI-Intrusion-Detection/
 
 | Method | Endpoint | 설명 |
 | --- | --- | --- |
-| `GET` | `/api_root/Post/` | 게시물 목록 JSON (`author, title, text, created_date, published_date, image`) |
+| `GET` | `/api_root/Post/` | 게시물 목록 JSON (`author, title, text, created_date, published_date, image, clip, clip_expired`) |
 | `POST` | `/api_root/Post/` | multipart `title`, `text`, `image` 등록 (`author`는 서버가 지정) |
 | `GET` | `/api_root/config/` | 원격 감시 설정 + Edge 상태 (`enabled, target_classes, conf_threshold, cooldown_sec, available_classes, edge_last_seen, edge_online, edge_seen_sec`) |
 | `PUT` / `PATCH` | `/api_root/config/` | 감시 설정 변경 (Android는 PUT) |
@@ -62,7 +62,7 @@ AI-Intrusion-Detection/
 | `GET` | `/post/<id>/` | 웹 게시물 상세 |
 | `GET` | `/admin/` | Django 관리자 |
 
-YOLOv5는 검출 클래스명을 `title`, 새로 나타난 클래스 목록을 `text`, 바운딩 박스가 그려진 프레임(320×240)을 `image`로 전송합니다.
+YOLOv5는 검출 클래스명을 `title`, 새로 나타난 클래스 목록을 `text`, 바운딩 박스가 그려진 프레임(320×240)을 `image`, 감지 전후 3초 영상(H.264 mp4)을 `clip`으로 전송합니다. 서버는 클립 총용량이 `CLIP_STORAGE_LIMIT_MB`(기본 200)를 넘으면 오래된 클립부터 지우고 `clip_expired=true`로 표시합니다.
 
 ## Getting Started
 
@@ -90,6 +90,7 @@ cd YOLOv5
 python3.9 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt -c <(echo "numpy<2")   # Intel Mac(torch 2.2.2)은 numpy 2 비호환
+pip install imageio imageio-ffmpeg -c <(echo "numpy<2") # 이벤트 클립 인코딩(H.264)
 python detect.py --source 0                     # 기본 검출 (카메라 필요)
 ```
 
@@ -134,7 +135,7 @@ YOLO는 5초마다 서버의 감시 설정(`/api_root/config/`)을 받아 적용
 | **원격 감시 설정** | Android에서 감시 ON/OFF, 감시 대상 클래스(COCO 80개 중 선택), 신뢰도 임계값, 재등록 대기시간을 바꾸면 YOLO Edge가 polling으로 수 초 내 반영. 앱에서 Edge 온라인 상태 확인 |
 | **이벤트 클립 녹화 + 보관 정책** | 객체 출현 시 감지 전후 3초를 H.264 클립으로 만들어 게시물과 함께 업로드, 웹·Android에서 재생. 클립 총용량이 상한(기본 200MB)을 넘으면 오래된 클립부터 자동 삭제 |
 
-설계·구현: [`docs/EXTRA_FEATURES.md`](docs/EXTRA_FEATURES.md) (원격 감시 설정 구현됨, 클립 녹화 구현 예정)
+설계·구현·확인 결과: [`docs/EXTRA_FEATURES.md`](docs/EXTRA_FEATURES.md)
 
 상세 기준은 [`docs/ASSIGNMENT.md`](docs/ASSIGNMENT.md), 캡처 체크리스트는 [`docs/REPORT_CHECKLIST.md`](docs/REPORT_CHECKLIST.md).
 

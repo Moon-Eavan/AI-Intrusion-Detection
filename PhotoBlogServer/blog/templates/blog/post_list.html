@@ -25,6 +25,11 @@
                         {% else %}
                             <div class="thumb-placeholder">이미지 없음</div>
                         {% endif %}
+                        {% if post.clip %}
+                            <span class="clip-badge">▶ 클립</span>
+                        {% elif post.clip_expired %}
+                            <span class="clip-badge clip-badge-expired">클립 만료</span>
+                        {% endif %}
                     </div>
                     <div class="post-body">
                         <h3 class="post-title">{{ post.title }}</h3>

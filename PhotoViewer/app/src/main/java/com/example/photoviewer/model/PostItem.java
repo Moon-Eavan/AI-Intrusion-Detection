@@ -18,6 +18,9 @@ public class PostItem {
     private final String imageUrl;
     private Bitmap bitmap;
     private boolean favorite;
+    // ID 10 기능 B: 이벤트 클립. Room 오프라인 캐시에는 저장하지 않으므로 생성자가 아닌 setter로 받는다
+    private String clipUrl;
+    private boolean clipExpired;
 
     public PostItem(String author, String title, String text, String createdDate,
                      String publishedDate, String imageUrl) {
@@ -116,6 +119,23 @@ public class PostItem {
      */
     public String getPostKey() {
         return isValid(createdDate) ? createdDate : "";
+    }
+
+    public void setClip(String clipUrl, boolean clipExpired) {
+        this.clipUrl = clipUrl;
+        this.clipExpired = clipExpired;
+    }
+
+    public String getClipUrl() {
+        return clipUrl;
+    }
+
+    public boolean hasClip() {
+        return isValid(clipUrl);
+    }
+
+    public boolean isClipExpired() {
+        return clipExpired;
     }
 
     public boolean isFavorite() {

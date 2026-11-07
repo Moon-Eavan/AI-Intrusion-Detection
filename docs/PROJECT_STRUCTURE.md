@@ -1,6 +1,6 @@
 # 프로젝트 구조
 
-현재 저장소 기준이다. ID 10 기능 A 파일은 구현됨, 기능 B 파일은 구현 예정.
+현재 저장소 기준이다 (ID 10 기능 A·B 구현 포함).
 
 ## 1. 루트
 
@@ -33,10 +33,12 @@ PhotoBlogServer/
     ├── serializers.py        # PostSerializer (author read_only, id 없음), MonitorConfigSerializer
     ├── views.py              # BlogImages(ModelViewSet) + 웹 목록/상세/작성/수정, MonitorConfigView, EdgeHeartbeatView
     ├── urls.py               # '', post/<pk>/, post/new/, post/<pk>/edit/, api_root/config/, api_root/config/edge/, api_root/
+    ├── clip_storage.py       # ID 10 B: 클립 총용량 상한(CLIP_STORAGE_LIMIT_MB) FIFO 정리
+    ├── signals.py            # ID 10 B: 게시물 삭제 시 이미지·클립 파일 삭제 (apps.ready에서 등록)
     ├── forms.py / admin.py / apps.py
-    ├── tests.py              # 40개 테스트 (API·웹·모델 28 + 감시 설정 12)
-    ├── migrations/           # 0001_initial, 0002_monitorconfig
-    ├── templates/blog/       # base, post_list, post_detail, post_edit
+    ├── tests.py              # 50개 테스트 (API·웹·모델 28 + 감시 설정 12 + 클립 10)
+    ├── migrations/           # 0001_initial, 0002_monitorconfig, 0003_post_clip_post_clip_expired
+    ├── templates/blog/       # base, post_list(클립 배지), post_detail(<video>), post_edit
     └── static/blog/css/
 ```
 
@@ -90,9 +92,9 @@ upstream `ultralytics/yolov5` `e128e595e13c39faecaf2d5ccd3a14daeb2ff40a` (2026-1
 ```text
 YOLOv5/
 ├── detect.py                # upstream + ChangeDetection 연동 5곳(`# added (Ch08 p.11)`) + 감시 필터 2줄(`# added (ID 10 기능 A)`)
-├── changedetection.py       # 0→1 변화 감지 + 이미지 저장(320×240) + POST /api_root/Post/, 감시 OFF·재등록 대기(ID 10 A)
+├── changedetection.py       # 0→1 변화 감지 + 이미지 저장(320×240) + POST /api_root/Post/, 감시 OFF·재등록 대기(ID 10 A), 클립 녹화·백그라운드 업로드(ID 10 B)
 ├── monitorconfig.py         # ID 10 A: 5초 heartbeat 스레드, 서버 설정 보관, 클래스·신뢰도 필터
-├── (ID 10 B 모듈)           # (예정) 클립 녹화·인코딩
+├── cliprecorder.py          # ID 10 B: 최근 3초 버퍼 + 감지 후 3초 녹화, imageio(H.264) 인코딩
 ├── .vscode/launch.json      # 강의자료 p.7 디버깅 설정 (upstream `.gitignore`의 `*.json`으로 Git 제외, 로컬 전용)
 ├── models/ utils/ data/     # upstream
 ├── requirements.txt         # upstream
@@ -114,7 +116,7 @@ YOLOv5/
 | `docs/ASSIGNMENT.md` | 평가표 ID 1~10 |
 | `docs/IMPLEMENTATION_PLAN.md` | Phase별 계획과 진행 상태 |
 | `docs/YOLOV5_INTEGRATION.md` | 강의 코드를 현재 API에 맞추는 방법 |
-| `docs/EXTRA_FEATURES.md` | ID 10 기능 A(원격 감시 설정)·B(이벤트 클립 녹화) 설계 |
+| `docs/EXTRA_FEATURES.md` | ID 10 기능 A(원격 감시 설정)·B(이벤트 클립 녹화) 설계·구현·확인 결과 |
 | `docs/ANDROID_FEATURES.md` | Android 기존 기능, ID 10 Android 변경 범위 |
 | `docs/REPORT_CHECKLIST.md` | 평가 ID별 캡처·보고서 체크리스트 |
 | `docs/ch08.md` | Ch08 강의자료 정리본 |

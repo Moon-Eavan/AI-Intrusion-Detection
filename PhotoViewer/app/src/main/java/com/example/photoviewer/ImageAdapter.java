@@ -50,6 +50,17 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
         holder.dateView.setText(postItem.getDisplayDate());
         holder.favoriteIcon.setText(postItem.isFavorite() ? "♥" : "♡");
 
+        // ID 10 기능 B: 클립 있음 / 보관 정책으로 만료됨 표시
+        if (postItem.hasClip()) {
+            holder.clipBadge.setText("▶ 클립");
+            holder.clipBadge.setVisibility(View.VISIBLE);
+        } else if (postItem.isClipExpired()) {
+            holder.clipBadge.setText("클립 만료");
+            holder.clipBadge.setVisibility(View.VISIBLE);
+        } else {
+            holder.clipBadge.setVisibility(View.GONE);
+        }
+
         if (postItem.getBitmap() != null) {
             holder.imageView.setImageBitmap(postItem.getBitmap());
             holder.imageView.setVisibility(View.VISIBLE);
@@ -77,6 +88,8 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
             intent.putExtra(DetailActivity.EXTRA_DATE, postItem.getDisplayDate());
             intent.putExtra(DetailActivity.EXTRA_IMAGE_URL, postItem.getImageUrl());
             intent.putExtra(DetailActivity.EXTRA_FAVORITE, postItem.isFavorite());
+            intent.putExtra(DetailActivity.EXTRA_CLIP_URL, postItem.hasClip() ? postItem.getClipUrl() : null);
+            intent.putExtra(DetailActivity.EXTRA_CLIP_EXPIRED, postItem.isClipExpired());
             context.startActivity(intent);
         });
     }
@@ -93,6 +106,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
         TextView textView;
         TextView dateView;
         TextView favoriteIcon;
+        TextView clipBadge;
 
         public ImageViewHolder(View itemView) {
             super(itemView);
@@ -102,6 +116,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
             textView = itemView.findViewById(R.id.itemText);
             dateView = itemView.findViewById(R.id.itemDate);
             favoriteIcon = itemView.findViewById(R.id.favoriteIcon);
+            clipBadge = itemView.findViewById(R.id.clipBadge);
         }
     }
 }

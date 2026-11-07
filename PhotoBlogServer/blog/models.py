@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.validators import FileExtensionValidator, MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils import timezone
 
@@ -11,6 +11,10 @@ class Post(models.Model):
     created_date = models.DateTimeField(default=timezone.now)
     published_date = models.DateTimeField(blank=True, null=True)
     image = models.ImageField(upload_to='blog_image/%Y/%m/%d/', blank=True)
+    # ID 10 기능 B: 이벤트 전후 클립. 클립 총용량이 상한을 넘으면 오래된 것부터 파일만 지우고 clip_expired로 표시
+    clip = models.FileField(upload_to='blog_clip/%Y/%m/%d/', blank=True,
+                            validators=[FileExtensionValidator(['mp4'])])
+    clip_expired = models.BooleanField(default=False)
 
     def publish(self):
         self.published_date = timezone.now()

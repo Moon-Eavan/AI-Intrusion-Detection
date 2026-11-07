@@ -8,9 +8,9 @@ Phase 단위로 진행하고, 각 Phase의 확인 항목을 실제로 수행한 
 ## 현재 상태 (2026-11-07)
 
 - `PhotoBlogServer/`, `PhotoViewer/`: 공통평가 01 코드 복사, Phase 0 베이스라인 확인 완료.
-- `YOLOv5/`: upstream `e128e59` clone, `.git` 제거, venv 설치, 웹캠 기본 실행·ID 3 캡처 완료 (Phase 1). `changedetection.py` 작성·`detect.py` 5곳 수정, ID 4 캡처 완료 (Phase 2). 웹캠 → 로컬 Django 연동 확인 완료 (Phase 3, `--conf-thres 0.5`). 기능 A 구현·웹캠 증빙 완료 (Phase 4). 다음: Phase 5
-- Git: `main` 브랜치, 최신 `1ccb5a8 docs: record Phase 3 webcam test results` (YOLOv5 일반 파일 141개로 추적), `origin = git@github.com:Moon-Eavan/AI-Intrusion-Detection.git`
-- ID 10 기능 확정: A 원격 감시 설정(구현됨), B 이벤트 클립 녹화 + 보관 정책(설계 단계) — `docs/EXTRA_FEATURES.md`
+- `YOLOv5/`: upstream `e128e59` clone, `.git` 제거, venv 설치, 웹캠 기본 실행·ID 3 캡처 완료 (Phase 1). `changedetection.py` 작성·`detect.py` 5곳 수정, ID 4 캡처 완료 (Phase 2). 웹캠 → 로컬 Django 연동 확인 완료 (Phase 3, `--conf-thres 0.5`). 기능 A 구현·웹캠 증빙 완료 (Phase 4). 기능 B 구현·웹캠 증빙 완료 (Phase 5). 다음: Phase 6
+- Git: `main` 브랜치, 최신 `77ee684 feat: add remote monitoring config (ID 10 feature A)` (YOLOv5 일반 파일 141개로 추적), `origin = git@github.com:Moon-Eavan/AI-Intrusion-Detection.git`
+- ID 10 기능 확정: A 원격 감시 설정(구현됨), B 이벤트 클립 녹화 + 보관 정책(구현됨) — `docs/EXTRA_FEATURES.md`
 - **`ApiConfig.BASE_URL`이 로컬 테스트용 `http://10.0.2.2:8000` 상태.** Phase 5(클립 재생)·Phase 6(ID 7)도 로컬이 필요해 유지하고, Phase 7 전에 Cloud로 되돌린다
 
 ## Phase 0 — 기존 코드 베이스라인 확인 ✅ (2026-11-02)
@@ -99,14 +99,20 @@ python detect.py --source 0     # ← ID 3 (사용자)
 - 시작 직후 오검출 게시물 18건 삭제(사용자 요청, 이미지 파일 포함, 백업 scratchpad `db_backup_before_delete_phase4.sqlite3`) → 로컬 DB 36건 (기존 16 + Phase 3 4건 + Phase 4 시나리오 16건)
 - [x] 10-1 `/api_root/config/` 브라우저 캡처 (사용자, 상단 설정 필드 부분)
 
-## Phase 5 — 기능 B: 이벤트 클립 녹화 + 보관 정책 (ID 10)
+## Phase 5 — 기능 B: 이벤트 클립 녹화 + 보관 정책 (ID 10) ✅ (2026-11-07)
 
-`docs/EXTRA_FEATURES.md` 기능 B.
+`docs/EXTRA_FEATURES.md` 기능 B (구현 내용·확인 결과 상세).
 
-- [ ] Django: `clip`, `clip_expired` 필드·migration, serializer, 파일 정리 시그널, 용량 기준 FIFO, 웹 `<video>`, 테스트
-- [ ] YOLOv5: `pip install imageio imageio-ffmpeg`, ring buffer, 전후 3초 수집, 백그라운드 인코딩·업로드
-- [ ] Android: `PostItem` 파싱, 목록 클립 표시, `DetailActivity` 재생 (Room 캐시 스키마는 유지)
-- [ ] 증빙 시나리오 1~4 확인·캡처
+- [x] Django: `clip`, `clip_expired` 필드·migration `0003`, serializer, 파일 정리 시그널(`signals.py`), 용량 기준 FIFO(`clip_storage.py`, `CLIP_STORAGE_LIMIT_MB` 기본 200), 웹 목록 배지·상세 `<video>`, 테스트 10개 추가 → **50개 OK**. 로컬 DB migration 적용(백업: scratchpad `db_backup_before_phase5.sqlite3`)
+- [x] YOLOv5: `pip install imageio imageio-ffmpeg`(2.37.2 / 0.6.0, numpy 1.26.4 유지), `cliprecorder.py`(3초 버퍼 + 감지 후 3초), `changedetection.py` 백그라운드 인코딩·업로드. `detect.py` 수정 없음
+  - 테스트 영상(임시 서버 8765): 클립 2개(약 6초, 6fps, H.264 yuv420p 320×240, faststart), 녹화 중 `tie` 병합, 클립 첫 3초 = 감지 전 장면 확인
+- [x] Android: `PostItem.setClip`, 목록 "▶ 클립"/"클립 만료" 배지, `DetailActivity` `VideoView` 반복 재생·만료 문구. 빌드·에뮬레이터 재생(00:06) 확인
+- [x] 파일 정리: 테스트 게시물 삭제 시 이미지·클립 파일 삭제 확인
+- [x] 웹캠 증빙 (서버 `CLIP_STORAGE_LIMIT_MB=0.3`으로 임시 실행, 대상 person·cell phone, 대기 10초): 이벤트 6건 모두 클립 업로드(22~127KB), 녹화 중 `cell phone` 병합 2회, 4번째 클립부터 상한 초과 → 오래된 3건 `clip_expired`(게시물·사진 유지), 남은 클립 3개 232KB. 앱 목록 배지·상세 재생·만료 화면 확인
+  - 시작 직후 첫 이벤트는 버퍼가 비어 감지 전 구간 없이 3.1초 클립
+  - 앱 동기화가 한 번 `Failed to connect`(일시적)로 오프라인 캐시 표시 → 재시도 시 정상
+- [x] 증빙 후 서버를 기본 상한(200MB)으로 재시작, 감시 설정 기본값 복원
+- [x] 증빙 파일: `../AI-Intrusion-Detection-docs/captures/phase5/` (YOLO 로그 10-4, API 응답 10-5, 앱 화면 4장 10-6). 웹 캡처 10-5는 사용자
 
 ## Phase 6 — 로컬 최종 캡처 (ID 5·6·7)
 

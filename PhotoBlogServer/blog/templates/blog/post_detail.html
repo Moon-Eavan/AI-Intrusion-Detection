@@ -27,6 +27,16 @@
             </figure>
         {% endif %}
 
+        {# ID 10 기능 B: YOLO 이벤트 전후 클립 #}
+        {% if post.clip %}
+            <figure class="detail-clip">
+                <video src="{{ post.clip.url }}" controls playsinline preload="metadata"{% if post.image %} poster="{{ post.image.url }}"{% endif %}></video>
+                <figcaption>이벤트 전후 클립</figcaption>
+            </figure>
+        {% elif post.clip_expired %}
+            <p class="clip-expired">클립 만료됨 · 보관 용량을 넘어 오래된 클립부터 삭제되었습니다.</p>
+        {% endif %}
+
         <div class="detail-text">{{ post.text|linebreaks }}</div>
     </article>
 {% endblock %}

@@ -35,6 +35,12 @@
     <string name="action_upload">업로드</string>
     <string name="action_cancel">취소</string>
 
+    <!-- ID 10 기능 B: 이벤트 클립 -->
+    <string name="label_event_clip">이벤트 클립</string>
+    <string name="clip_hint">감지 전 3초 + 감지 후 3초 · 화면을 누르면 재생 컨트롤</string>
+    <string name="clip_expired">클립 만료됨 · 보관 용량을 넘어 오래된 클립부터 삭제되었습니다.</string>
+    <string name="clip_error">클립을 재생할 수 없습니다.</string>
+
     <!-- ID 10 기능 A: 원격 감시 설정 -->
     <string name="action_monitor_settings">감시 설정</string>
     <string name="edge_status_loading">Edge 상태 확인 중…</string>

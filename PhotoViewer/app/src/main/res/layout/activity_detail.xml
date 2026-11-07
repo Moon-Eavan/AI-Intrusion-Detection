@@ -94,6 +94,41 @@
                     app:drawableTopCompat="@drawable/ic_image" />
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- ID 10 기능 B: 이벤트 전후 클립 (클립이 있거나 만료된 게시물만 표시) -->
+            <LinearLayout
+                android:id="@+id/clipSection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_xl"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    style="@style/PhotoBlog.FieldLabel"
+                    android:text="@string/label_event_clip" />
+
+                <FrameLayout
+                    android:id="@+id/clipContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/detail_clip_height"
+                    android:background="@color/black">
+
+                    <VideoView
+                        android:id="@+id/clipVideo"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center" />
+                </FrameLayout>
+
+                <TextView
+                    android:id="@+id/clipStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_sm"
+                    android:textColor="@color/pb_muted"
+                    android:textSize="@dimen/text_caption" />
+            </LinearLayout>
+
             <TextView
                 android:id="@+id/detailText"
                 android:layout_width="match_parent"

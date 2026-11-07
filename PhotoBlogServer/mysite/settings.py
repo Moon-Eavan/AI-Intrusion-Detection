@@ -140,6 +140,9 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+# ID 10 기능 B: 이벤트 클립 총용량 상한(MB). 넘으면 오래된 클립부터 삭제 (PythonAnywhere 무료 계정 디스크 보호)
+CLIP_STORAGE_LIMIT_MB = float(os.environ.get('CLIP_STORAGE_LIMIT_MB', '200'))
+
 # 게시물 작성 화면(post_new/post_edit) 로그인에 Django admin 로그인 화면을 재사용
 LOGIN_URL = '/admin/login/'
 

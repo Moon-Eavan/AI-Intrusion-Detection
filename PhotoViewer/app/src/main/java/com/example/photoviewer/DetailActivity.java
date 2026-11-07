@@ -7,7 +7,10 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.net.Uri;
+import android.widget.MediaController;
 import android.widget.TextView;
+import android.widget.VideoView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -29,6 +32,8 @@ public class DetailActivity extends AppCompatActivity {
     public static final String EXTRA_DATE = "extra_date";
     public static final String EXTRA_IMAGE_URL = "extra_image_url";
     public static final String EXTRA_FAVORITE = "extra_favorite";
+    public static final String EXTRA_CLIP_URL = "extra_clip_url";
+    public static final String EXTRA_CLIP_EXPIRED = "extra_clip_expired";
 
     ZoomableImageView detailImage;
     TextView noImageLabel;
@@ -72,6 +77,38 @@ public class DetailActivity extends AppCompatActivity {
             noImageLabel.setVisibility(View.VISIBLE);
         } else {
             new LoadImageTask().execute(imageUrl);
+        }
+
+        showClip(getIntent().getStringExtra(EXTRA_CLIP_URL), getIntent().getBooleanExtra(EXTRA_CLIP_EXPIRED, false));
+    }
+
+    /** ID 10 기능 B: 이벤트 클립을 서버에서 스트리밍 재생한다 (반복 재생, 화면을 누르면 재생 컨트롤). */
+    private void showClip(String clipUrl, boolean clipExpired) {
+        View clipSection = findViewById(R.id.clipSection);
+        View clipContainer = findViewById(R.id.clipContainer);
+        TextView clipStatus = findViewById(R.id.clipStatus);
+        VideoView clipVideo = findViewById(R.id.clipVideo);
+
+        if (!TextUtils.isEmpty(clipUrl)) {
+            clipSection.setVisibility(View.VISIBLE);
+            clipStatus.setText(R.string.clip_hint);
+            MediaController controller = new MediaController(this);
+            controller.setAnchorView(clipVideo);
+            clipVideo.setMediaController(controller);
+            clipVideo.setVideoURI(Uri.parse(clipUrl));
+            clipVideo.setOnPreparedListener(mp -> {
+                mp.setLooping(true);
+                clipVideo.start();
+            });
+            clipVideo.setOnErrorListener((mp, what, extra) -> {
+                Log.e(TAG, "클립 재생 실패 what=" + what + " extra=" + extra + " url=" + clipUrl);
+                clipStatus.setText(R.string.clip_error);
+                return true;
+            });
+        } else if (clipExpired) {
+            clipSection.setVisibility(View.VISIBLE);
+            clipContainer.setVisibility(View.GONE);
+            clipStatus.setText(R.string.clip_expired);
         }
     }
 

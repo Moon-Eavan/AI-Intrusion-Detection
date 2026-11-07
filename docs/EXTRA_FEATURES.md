@@ -6,7 +6,7 @@
 | B | 이벤트 클립 녹화 + 보관 정책 | YOLOv5 + Django + Android |
 
 - 기능 A: **구현·웹캠 증빙 완료 (Phase 4, 2026-11-07)**. 구현하며 바뀐 점은 "구현" 절, 결과는 "구현 확인 결과"·"증빙 결과"에 적었다.
-- 기능 B: 설계 단계. 아래 값(길이, 상한 등)은 기본안이며 구현 중 조정할 수 있다.
+- 기능 B: **구현·웹캠 증빙 완료 (Phase 5, 2026-11-07)**. 결과는 기능 B "구현 확인 결과" 절.
 PythonAnywhere 무료 계정은 서버 → Edge 방향 연결(push, WebSocket)이 안 되므로 **Edge가 서버를 polling**하는 구조를 쓴다.
 
 ---
@@ -137,8 +137,25 @@ Android 앱에서 YOLO Edge의 감시 동작(ON/OFF, 감시 대상 클래스, �
 - `DetailActivity`: 클립이 있으면 `VideoView` + `MediaController`로 스트리밍 재생, 만료면 "클립 만료됨"
 - **Room 오프라인 캐시(`PostCacheEntity`, DB v2)는 변경하지 않는다** → 오프라인 목록에서는 클립 없음. 스키마 변경에 따른 migration 위험을 피하기 위함
 
+### 구현 파일
+
+- YOLOv5: `cliprecorder.py`(신규: 버퍼·녹화·인코딩), `changedetection.py`(`send()`는 사진 저장 후 녹화 시작, `upload()`가 스레드에서 인코딩 + `image`·`clip` 함께 POST, 인코딩 실패 시 사진만 전송). `detect.py`는 이미 매 프레임 `cd.add(…, im0)`를 호출하므로 수정 없음
+- 게시물 시각: `published_date` = 감지 순간(Edge), `created_date` = 업로드 시각(약 3~4초 뒤)
+- 클립은 사진과 같은 폴더에 같은 이름의 `.mp4`로 저장(`runs/…/detected/`, Git 제외)
+- Django: `blog/clip_storage.py`(`enforce_clip_storage_limit()`, `perform_create`에서 클립이 있을 때 호출), `blog/signals.py`(`apps.ready`에서 등록), mp4 확장자만 허용(`FileExtensionValidator`)
+- 웹: 목록 썸네일 "▶ 클립"/"클립 만료" 배지, 상세 `<video controls>`(poster = 사진)
+- Android: `PostItem.setClip()`(Room 캐시용 생성자는 그대로), 목록 배지, `DetailActivity` `VideoView` + `MediaController`, 준비되면 반복 재생
+
+### 구현 확인 결과 (2026-11-07)
+
+- Django 테스트 50개 OK (신규 10: 클립 업로드 URL, 클립 없는 업로드, mp4 외 400, `clip_expired` read-only, FIFO 만료 순서, 만료 파일 삭제, 상한 이하 유지, 게시물 삭제 시 파일 삭제, 웹 상세 video/만료 문구, 웹 목록 배지)
+- 테스트 영상: 클립 약 6초·6fps·H.264 yuv420p·faststart, 첫 3초가 감지 전 장면, 녹화 중 `tie` 병합
+- 웹캠 (상한 0.3MB로 임시 실행): 이벤트 6건 모두 클립(22~127KB), 녹화 중 `cell phone` 병합, 오래된 3건 만료(게시물·사진 유지), 앱 목록 배지·상세 재생·만료 화면 확인
+- 증빙 파일: `../AI-Intrusion-Detection-docs/captures/phase5/`
+
 ### 한계 (보고서에 명시)
 
+- Edge 시작 직후의 이벤트는 버퍼가 비어 감지 전 구간이 짧다.
 - 녹화 중 발생한 출현은 진행 중 클립에 합쳐진다.
 - 이벤트 후 약 3초 + 인코딩·업로드 시간이 지나야 게시물이 생긴다.
 - 클립은 저해상도(320×240)이며, 오래된 클립은 상한 초과 시 삭제된다.

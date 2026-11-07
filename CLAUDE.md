@@ -10,9 +10,9 @@
 
 ## 현재 상태 (2026-11-07)
 
-- Phase 0 완료(Django 테스트 28 OK, Android 빌드·에뮬레이터 Cloud 동기화 확인), Phase 1 완료(YOLOv5 `e128e59`, ID 3 캡처), Phase 2 완료(`changedetection.py`, `detect.py` +7줄, ID 4 캡처), Phase 3 완료(웹캠 → 로컬 Django, `--conf-thres 0.5`로 중복 없음 확인), Phase 4 완료(기능 A, Django 테스트 40 OK, 웹캠 증빙 시나리오 성공), `origin = Moon-Eavan/AI-Intrusion-Detection` (최신 커밋 `1ccb5a8`)
+- Phase 0 완료(Django 테스트 28 OK, Android 빌드·에뮬레이터 Cloud 동기화 확인), Phase 1 완료(YOLOv5 `e128e59`, ID 3 캡처), Phase 2 완료(`changedetection.py`, `detect.py` +7줄, ID 4 캡처), Phase 3 완료(웹캠 → 로컬 Django, `--conf-thres 0.5`로 중복 없음 확인), Phase 4 완료(기능 A, 웹캠 증빙), Phase 5 완료(기능 B, Django 테스트 50 OK, 웹캠 증빙), `origin = Moon-Eavan/AI-Intrusion-Detection` (최신 커밋 `77ee684`)
 - `ApiConfig.BASE_URL`: 기본 `https://hoynola.pythonanywhere.com`, 로컬 에뮬레이터는 이 한 줄만 `http://10.0.2.2:8000`. **지금은 로컬 테스트용 `10.0.2.2:8000` 상태 (Phase 7 전에 되돌림)**
-- ID 10 편의 기능 확정: A 원격 감시 설정(구현됨), B 이벤트 클립 녹화 + 보관 정책(설계만) — `docs/EXTRA_FEATURES.md`. 이 외 기능을 임의로 추가하지 않는다
+- ID 10 편의 기능 확정: A 원격 감시 설정(구현됨), B 이벤트 클립 녹화 + 보관 정책(구현됨) — `docs/EXTRA_FEATURES.md`. 이 외 기능을 임의로 추가하지 않는다
 - 진행 상황은 `docs/IMPLEMENTATION_PLAN.md`의 체크박스로 관리한다
 
 ## 문서 (필요한 것만 읽기)
@@ -39,6 +39,7 @@
 - Claude가 `detect.py --source 0`을 백그라운드로 실행할 수 있다(터미널 카메라 권한 공유, 로그 즉시 보려면 `python -u`) — 사용자는 카메라 앞 동작만, 종료는 SIGINT
 - Android `HttpURLConnection`은 PATCH 미지원 → 앱의 설정 저장은 PUT
 - 에뮬레이터는 quickboot 스냅샷의 예전 앱으로 뜰 수 있다 → 테스트 전 `adb install -r`로 최신 APK 설치
+- 클립: YOLO venv에 `imageio`·`imageio-ffmpeg` 필요(`numpy<2` 유지). 클립 때문에 게시물은 감지 후 약 3~4초 뒤 생성. 보관 상한은 `CLIP_STORAGE_LIMIT_MB` 환경변수(기본 200)
 
 ## 작업 원칙
 

@@ -1,7 +1,7 @@
 # YOLOv5 ↔ Django ↔ Android 연동 가이드
 
 강의자료 원문 코드는 `docs/ch08.md`에 있다. 이 문서는 그 코드를 **현재 저장소의 Django API에 맞게 적용하는 방법**을 정리한 설계 노트다.
-`YOLOv5/`는 upstream `e128e59`(2026-11-01)로 설치됐고(Phase 1), §3·§4의 강의 기반 연동은 Phase 2에서 구현했다(`YOLOv5/changedetection.py`, `detect.py` +7줄). ID 10 기능 A(원격 감시 설정)는 Phase 4에서 `monitorconfig.py` + `detect.py` 2줄 + `changedetection.py` 조건 추가로 구현했다(`docs/EXTRA_FEATURES.md`). 기능 B(클립)는 구현 전이다.
+`YOLOv5/`는 upstream `e128e59`(2026-11-01)로 설치됐고(Phase 1), §3·§4의 강의 기반 연동은 Phase 2에서 구현했다(`YOLOv5/changedetection.py`, `detect.py` +7줄). ID 10 기능 A(원격 감시 설정)는 Phase 4에서 `monitorconfig.py` + `detect.py` 2줄 + `changedetection.py` 조건 추가로 구현했다(`docs/EXTRA_FEATURES.md`). 기능 B(이벤트 클립)는 Phase 5에서 `cliprecorder.py` + `changedetection.py` 수정으로 구현했다(`detect.py` 수정 없음).
 
 ## 1. 데이터 흐름
 
@@ -11,8 +11,9 @@
        ↑ monitorconfig.py: 5초마다 POST {HOST}/api_root/config/edge/ → 감시 설정 수신
   → changedetection.py: 이전 상태와 비교, 0→1 변화가 있을 때만
        └ runs/detect/expN/detected/YYYY/M/D/*.jpg 저장 (320×240)
-       └ POST {HOST}/api_root/Post/  (multipart: title, text, image)
-  → Django: Post 저장 (media/blog_image/YYYY/MM/DD/)
+       └ (ID 10 B) 감지 전 3초 버퍼 + 감지 후 3초 녹화 → 백그라운드 스레드에서 H.264 mp4 인코딩
+       └ POST {HOST}/api_root/Post/  (multipart: title, text, image, clip) — 감지 후 약 3~4초 뒤
+  → Django: Post 저장 (media/blog_image/·blog_clip/YYYY/MM/DD/), 클립 총용량 상한 초과 시 오래된 클립 만료
   → 브라우저 / api_root, Android PhotoViewer(GET /api_root/Post/)
 ```
 

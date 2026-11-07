@@ -470,6 +470,8 @@ public class MainActivity extends AppCompatActivity {
                                 + ", image=" + imageUrl);
 
                         PostItem postItem = new PostItem(author, title, text, createdDate, publishedDate, imageUrl);
+                        // ID 10 기능 B: 클립 URL(없으면 JSON null → "null"), 보관 정책으로 삭제됐는지
+                        postItem.setClip(post.optString("clip"), post.optBoolean("clip_expired"));
                         // image URL이 없거나 다운로드/디코딩에 실패해도 Bitmap만 null로 두고
                         // 게시물 자체는 목록에서 제외하지 않는다 (제목/본문/날짜/상세화면은 정상 표시되어야 함).
                         postItemList.add(postItem);
