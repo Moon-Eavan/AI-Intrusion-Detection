@@ -8,10 +8,11 @@ Phase 단위로 진행하고, 각 Phase의 확인 항목을 실제로 수행한 
 ## 현재 상태 (2026-11-07)
 
 - `PhotoBlogServer/`, `PhotoViewer/`: 공통평가 01 코드 복사, Phase 0 베이스라인 확인 완료.
-- `YOLOv5/`: upstream `e128e59` clone, `.git` 제거, venv 설치, 웹캠 기본 실행·ID 3 캡처 완료 (Phase 1). `changedetection.py` 작성·`detect.py` 5곳 수정, ID 4 캡처 완료 (Phase 2). 웹캠 → 로컬 Django 연동 확인 완료 (Phase 3, `--conf-thres 0.5`). 기능 A 구현·웹캠 증빙 완료 (Phase 4). 기능 B 구현·웹캠 증빙 완료 (Phase 5). Phase 6 로컬 최종 게시물 생성·ID 7·회귀 확인 완료, ID 5·6 브라우저 캡처는 사용자
+- `YOLOv5/`: upstream `e128e59` clone, `.git` 제거, venv 설치, 웹캠 기본 실행·ID 3 캡처 완료 (Phase 1). `changedetection.py` 작성·`detect.py` 5곳 수정, ID 4 캡처 완료 (Phase 2). 웹캠 → 로컬 Django 연동 확인 완료 (Phase 3, `--conf-thres 0.5`). 기능 A 구현·웹캠 증빙 완료 (Phase 4). 기능 B 구현·웹캠 증빙 완료 (Phase 5). Phase 6 로컬 최종 게시물 생성·ID 7·회귀 확인 완료. Phase 7 PythonAnywhere 배포·Cloud YOLO 게시물·Android Cloud 확인 완료, ID 8·9 브라우저 캡처는 사용자. 다음: Phase 8
 - Git: `main` 브랜치, 최신 `e5bd833 fix: remove trailing comma from detection post text` (YOLOv5 일반 파일 141개로 추적), `origin = git@github.com:Moon-Eavan/AI-Intrusion-Detection.git`
 - ID 10 기능 확정: A 원격 감시 설정(구현됨), B 이벤트 클립 녹화 + 보관 정책(구현됨) — `docs/EXTRA_FEATURES.md`
-- **`ApiConfig.BASE_URL`이 로컬 테스트용 `http://10.0.2.2:8000` 상태.** Phase 5(클립 재생)·Phase 6(ID 7)도 로컬이 필요해 유지하고, Phase 7 전에 Cloud로 되돌린다
+- `ApiConfig.BASE_URL` = Cloud(`https://hoynola.pythonanywhere.com`)로 복원 (Phase 7). 로컬 테스트 때만 `http://10.0.2.2:8000`
+- PythonAnywhere: `/home/hoynola/AI-Intrusion-Detection/PhotoBlogServer`에서 이 저장소 코드로 동작, `DEBUG=False`, 새 `SECRET_KEY`(WSGI 파일 환경변수). 이전 `~/Mobile-Webservice`는 되돌리기용으로 남겨 둠
 
 ## Phase 0 — 기존 코드 베이스라인 확인 ✅ (2026-11-02)
 
@@ -128,18 +129,32 @@ python detect.py --source 0     # ← ID 3 (사용자)
   - 오프라인 캐시: Phase 5에서 일시 연결 실패 시 캐시 37건 표시 확인
   - 조작 중 키보드가 닫힌 상태에서 BACK을 보내 앱이 한 번 종료됨(테스트 조작 실수, 앱 문제 아님)
 
-## Phase 7 — PythonAnywhere (ID 8·9)
+## Phase 7 — PythonAnywhere (ID 8·9) (2026-11-07)
 
-현재 Cloud는 이전 `settings.py`(SECRET_KEY 하드코딩, `DEBUG = True`)로 동작 중이다. 새 코드를 올리면 settings도 환경변수 방식으로 바뀌므로 아래를 함께 처리한다.
+배포 전 Cloud는 공통평가 01 코드(`~/Mobile-Webservice`, SECRET_KEY 하드코딩·`DEBUG = True`, 게시물 9건, `/api_root/config/` 404)였다.
+배포 방식: 새 저장소를 PA에 clone하고 웹앱 경로를 옮김 (기존 폴더는 되돌리기용으로 유지).
 
-- [ ] PythonAnywhere WSGI 설정 파일에 `os.environ['DJANGO_SECRET_KEY']` 지정. 이전 키가 공통평가 01 저장소 기록에 남아 있다면 **새 키로 교체** 권장 (키 값은 Git·문서·로그에 남기지 않음)
-- [ ] `DJANGO_DEBUG` 결정. `False`로 끄면 Django가 `/media/`를 서빙하지 않으므로(`mysite/urls.py`의 DEBUG 조건) **Web 탭 Static files에 `/media/` → `.../PhotoBlogServer/media` 매핑**이 있어야 이미지·클립이 보인다 (ID 9 영향)
-- [ ] 변경된 Django 코드 배포 → `python manage.py migrate` → Web 탭 Reload
-- [ ] 배포 후 기존 게시물 이미지가 여전히 열리는지 먼저 확인
-- [ ] `PHOTOBLOG_HOST=https://hoynola.pythonanywhere.com`으로 YOLO 실행해 Cloud에 검출 게시물(클립 포함) 등록
-- [ ] Cloud `api_root` 캡처 (ID 8), 웹 목록·이미지 캡처 (ID 9)
-- [ ] Android `BASE_URL`을 Cloud로 두고 동기화·클립 재생·설정 변경 확인
-- [ ] Cloud `media/` 사용량 확인
+```bash
+# PA Bash 콘솔 (사용자 실행)
+cd ~ && git clone https://github.com/Moon-Eavan/AI-Intrusion-Detection.git
+cp -a ~/Mobile-Webservice/PhotoBlogServer/db.sqlite3 ~/AI-Intrusion-Detection/PhotoBlogServer/
+cp -a ~/Mobile-Webservice/PhotoBlogServer/media ~/AI-Intrusion-Detection/PhotoBlogServer/
+workon photoblog-venv          # Python 3.10, 패키지 버전 requirements.txt와 동일
+cd ~/AI-Intrusion-Detection/PhotoBlogServer
+pip install -r requirements.txt && python manage.py migrate && python manage.py collectstatic --noinput
+# 이후 코드 갱신: cd ~/AI-Intrusion-Detection && git pull → (필요 시 migrate·collectstatic) → Web 탭 Reload
+```
+
+- [x] 새 코드 clone, 기존 `db.sqlite3`·`media/` 복사, `migrate`(0002·0003 OK), `collectstatic`(162개), 게시물 9건 유지
+- [x] 새 `SECRET_KEY` 생성(PA 콘솔) → WSGI 파일 `os.environ['DJANGO_SECRET_KEY']`, `os.environ['DJANGO_DEBUG'] = 'False'` (키 값은 어디에도 기록하지 않음). 이전 키는 폐기
+- [x] WSGI `path`, Web 탭 Source code·Working directory, Static files `/static/`·`/media/` → `/home/hoynola/AI-Intrusion-Detection/PhotoBlogServer/...`, virtualenv `photoblog-venv` 유지, Reload
+- [x] 외부 확인: `/`, `/api_root/`, `/api_root/Post/`(필드에 `clip`, `clip_expired`), `/api_root/config/`, `/admin/login/` 200, static CSS 200, 기존 이미지 8개 200, 없는 주소 404(디버그 화면 아님 → DEBUG 꺼짐)
+- [x] `PHOTOBLOG_HOST=https://hoynola.pythonanywhere.com`으로 YOLO 실행(Cloud 설정 person·cell phone, 대기 10초) → 6건(`person` 4, `cell phone` 2) 클립 포함 등록, Cloud 게시물 15건. 종료 직전 녹화 중이던 1건은 업로드 전 종료로 유실
+  - Cloud 클립 `video/mp4` 200. PA static 서버는 Range 요청에 206이 아닌 200 전체 응답 → faststart로 Chrome·Android 재생 가능, Safari는 재생 안 될 수 있음
+- [x] Android `BASE_URL` Cloud로 복원·재빌드 → 동기화 15건, 클립 배지, 상세 클립 재생(00:05/00:06), 감시 설정 화면(대상 2개·대기 10 로드), Edge 상태 표시 확인. 이후 Cloud 감시 설정 기본값 복원
+- [x] 증빙 파일: `../AI-Intrusion-Detection-docs/captures/phase7/` (Cloud 앱 목록·클립 재생·감시 설정)
+- [ ] Cloud `api_root` 캡처 (ID 8), 웹 목록·이미지 캡처 (ID 9) — 사용자
+- [ ] (선택) Cloud `media/` 사용량: PA 콘솔에서 `du -sh ~/AI-Intrusion-Detection/PhotoBlogServer/media` (이번 클립 6개 약 0.5MB, 상한 200MB)
 
 ## Phase 8 — 제출 (ID 1·2)
 

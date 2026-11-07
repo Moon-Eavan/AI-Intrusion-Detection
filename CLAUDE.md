@@ -10,8 +10,8 @@
 
 ## 현재 상태 (2026-11-07)
 
-- Phase 0 완료(Django 테스트 28 OK, Android 빌드·에뮬레이터 Cloud 동기화 확인), Phase 1 완료(YOLOv5 `e128e59`, ID 3 캡처), Phase 2 완료(`changedetection.py`, `detect.py` +7줄, ID 4 캡처), Phase 3 완료(웹캠 → 로컬 Django, `--conf-thres 0.5`로 중복 없음 확인), Phase 4 완료(기능 A, 웹캠 증빙), Phase 5 완료(기능 B, Django 테스트 50 OK, 웹캠 증빙), Phase 6 진행(로컬 최종 게시물·ID 7·Android 회귀 확인 완료, ID 5·6 브라우저 캡처 남음), `origin = Moon-Eavan/AI-Intrusion-Detection` (최신 커밋 `e5bd833`)
-- `ApiConfig.BASE_URL`: 기본 `https://hoynola.pythonanywhere.com`, 로컬 에뮬레이터는 이 한 줄만 `http://10.0.2.2:8000`. **지금은 로컬 테스트용 `10.0.2.2:8000` 상태 (Phase 7 전에 되돌림)**
+- Phase 0 완료(Django 테스트 28 OK, Android 빌드·에뮬레이터 Cloud 동기화 확인), Phase 1 완료(YOLOv5 `e128e59`, ID 3 캡처), Phase 2 완료(`changedetection.py`, `detect.py` +7줄, ID 4 캡처), Phase 3 완료(웹캠 → 로컬 Django, `--conf-thres 0.5`로 중복 없음 확인), Phase 4 완료(기능 A, 웹캠 증빙), Phase 5 완료(기능 B, Django 테스트 50 OK, 웹캠 증빙), Phase 6 완료(로컬 최종 게시물·ID 7·Android 회귀), Phase 7 완료(PA 배포·Cloud YOLO 게시물·Android Cloud 확인, ID 8·9 브라우저 캡처는 사용자), `origin = Moon-Eavan/AI-Intrusion-Detection` (최신 커밋 `e5bd833`)
+- `ApiConfig.BASE_URL`: 기본 `https://hoynola.pythonanywhere.com`, 로컬 에뮬레이터는 이 한 줄만 `http://10.0.2.2:8000`. 현재 Cloud 상태
 - ID 10 편의 기능 확정: A 원격 감시 설정(구현됨), B 이벤트 클립 녹화 + 보관 정책(구현됨) — `docs/EXTRA_FEATURES.md`. 이 외 기능을 임의로 추가하지 않는다
 - 진행 상황은 `docs/IMPLEMENTATION_PLAN.md`의 체크박스로 관리한다
 
@@ -33,7 +33,8 @@
 - `author`는 read_only(서버가 지정), 응답에 `id` 없음 → Android는 `created_date`를 게시물 키로 사용
 - `USE_TZ=True`, `TIME_ZONE='UTC'` → naive `datetime.now()`를 날짜 필드로 보내지 않는다
 - `ALLOWED_HOSTS`에 `localhost` 없음 → 브라우저는 `127.0.0.1:8000`
-- `SECRET_KEY`/`DEBUG`: **이 저장소(로컬) 코드**는 환경변수(`DJANGO_SECRET_KEY`, `DJANGO_DEBUG`). **PythonAnywhere 배포본은 아직 이전 settings.py**(SECRET_KEY 하드코딩, `DEBUG = True`) — Phase 7 배포 때 전환. 키 값은 어디에도 옮겨 적지 않는다
+- `SECRET_KEY`/`DEBUG`: **이 저장소(로컬) 코드**는 환경변수(`DJANGO_SECRET_KEY`, `DJANGO_DEBUG`). PythonAnywhere도 Phase 7부터 같은 코드(`/home/hoynola/AI-Intrusion-Detection/PhotoBlogServer`, 새 키·`DEBUG=False`를 WSGI 파일에서 지정, `/media/`·`/static/`은 Web 탭 매핑). 키 값은 어디에도 옮겨 적지 않는다
+- PA 코드 갱신: PA 콘솔에서 `git pull` → 필요하면 `migrate`·`collectstatic` → Web 탭 Reload (사용자). PA static 서버는 Range 미지원 → 클립은 Chrome·Android 재생, Safari 불확실
 - 강의 `detect.py` 줄 번호(49/109/154/162/184)는 2022년 버전 기준 → 코드 위치로 찾는다
 - 신뢰도 임계값: 기본 0.25는 배경 오검출이 깜빡여 중복 등록됨(Phase 3). 기능 A 이후에는 서버 `conf_threshold`(기본 0.5)가 필터하므로 `detect.py`는 `--conf-thres` 없이 실행한다(넣으면 앱에서 그 값 아래로 못 내림)
 - Claude가 `detect.py --source 0`을 백그라운드로 실행할 수 있다(터미널 카메라 권한 공유, 로그 즉시 보려면 `python -u`) — 사용자는 카메라 앞 동작만, 종료는 SIGINT

@@ -7,7 +7,7 @@ YOLOv5로 카메라 영상에서 객체 출현을 감지하고, 검출 이미지
 - REST API: <https://hoynola.pythonanywhere.com/api_root/Post/>
 - Django 서버와 Android 앱은 공통평가 01 저장소 [Mobile-Webservice](https://github.com/Moon-Eavan/Mobile-Webservice)의 코드를 재사용합니다.
 
-> **진행 상태 (2026-11-07):** Phase 0~3 완료 — YOLOv5 기본 검출(ID 3), `changedetection.py`·`detect.py` 연동(ID 4), 웹캠 → 로컬 Django 자동 등록 확인. Phase 4·5 완료 — ID 10 기능 A 원격 감시 설정, 기능 B 이벤트 클립 녹화 구현·웹캠 증빙. Phase 6 — 로컬 최종 게시물 생성, Android 화면(ID 7)·기존 기능 회귀 확인 완료. 다음: PythonAnywhere 배포(Phase 7).
+> **진행 상태 (2026-11-07):** Phase 0~3 완료 — YOLOv5 기본 검출(ID 3), `changedetection.py`·`detect.py` 연동(ID 4), 웹캠 → 로컬 Django 자동 등록 확인. Phase 4·5 완료 — ID 10 기능 A 원격 감시 설정, 기능 B 이벤트 클립 녹화 구현·웹캠 증빙. Phase 6 — 로컬 최종 게시물 생성, Android 화면(ID 7)·기존 기능 회귀 확인 완료. Phase 7 — PythonAnywhere에 새 코드 배포, Cloud로 YOLO 게시물·클립 등록 확인. 다음: 제출(Phase 8).
 > 단계별 상태는 [`docs/IMPLEMENTATION_PLAN.md`](docs/IMPLEMENTATION_PLAN.md)를 참고하세요.
 
 ## Architecture
@@ -142,6 +142,6 @@ YOLO는 5초마다 서버의 감시 설정(`/api_root/config/`)을 받아 적용
 ## Security & Repository Notes
 
 - 이 저장소의 `settings.py`는 `SECRET_KEY`를 `DJANGO_SECRET_KEY`, 디버그를 `DJANGO_DEBUG` 환경변수로 설정합니다 (`DEBUG=False`에서 키가 없으면 실행 중단).
-  PythonAnywhere에서 동작 중인 서버는 아직 이전 버전 설정(하드코딩된 `SECRET_KEY`, `DEBUG = True`)이며, 다음 배포 때 환경변수 방식으로 전환할 예정입니다.
+  PythonAnywhere도 같은 코드로 동작하며, WSGI 설정 파일에서 새 `DJANGO_SECRET_KEY`와 `DJANGO_DEBUG=False`를 지정합니다(이미지·클립·static은 Web 탭 Static files 매핑으로 서빙).
 - 게시물 API는 인증 없이 POST할 수 있습니다(강의 실습 범위). 강의자료의 JWT 예제 계정·토큰은 저장소에 넣지 않습니다.
 - Git 제외: `venv/`, `.env`, `db.sqlite3`, `media/`, `.coverage`, `htmlcov/`, `staticfiles/`, Android 빌드 산출물, YOLOv5 `venv/`·`*.pt`·`runs/*` (upstream `YOLOv5/.gitignore`)

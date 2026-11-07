@@ -83,7 +83,7 @@ Phase 2 구현에서 위 표의 처리를 모두 적용했다. 서버 통신 결
 
 - 브라우저는 `localhost` 대신 **`127.0.0.1`**로 접속한다(`localhost`는 `ALLOWED_HOSTS`에 없어 400). 캡처에 꼭 `localhost`가 필요하면 `ALLOWED_HOSTS`에 추가한다.
 - Android 실기기로 PC 로컬 서버에 붙으려면 PC의 LAN IP를 `ALLOWED_HOSTS`와 `res/xml/network_security_config.xml`(cleartext 허용 도메인)에 추가해야 한다.
-- Cloud 서버 코드는 공통평가 01 배포본이며, `settings.py`도 이전 버전(SECRET_KEY 하드코딩, `DEBUG = True`)이다. API 형식은 같으므로 기본 POST는 재배포 없이 가능하다. 단 ID 10 기능(모델·API 추가)은 배포가 필요하고, 그때 settings 전환도 함께 한다 (`IMPLEMENTATION_PLAN.md` Phase 7).
+- Cloud 서버도 Phase 7(2026-11-07)부터 이 저장소 코드로 동작한다(감시 설정 API·클립 포함). PA static 서버는 Range 요청을 지원하지 않아 클립은 전체 다운로드로 재생된다(faststart라 Chrome·Android는 재생됨).
 
 ## 7. 검증 시나리오
 

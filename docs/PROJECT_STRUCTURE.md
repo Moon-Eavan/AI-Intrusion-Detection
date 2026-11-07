@@ -49,8 +49,8 @@ PhotoBlogServer/
 - `DJANGO_SECRET_KEY`: 없으면 개발용 키 사용, 단 `DEBUG=False`면 실행 중단
 - `DJANGO_DEBUG`: 기본 `True`, `'False'`면 꺼짐
 
-> **PythonAnywhere 배포본은 다르다.** Cloud 서버는 아직 이전 `settings.py`(SECRET_KEY 하드코딩, `DEBUG = True`)로 동작 중이다.
-> 환경변수 방식은 로컬에만 반영되어 있고, Cloud 전환은 `docs/IMPLEMENTATION_PLAN.md` Phase 7에서 한다.
+> **PythonAnywhere:** `/home/hoynola/AI-Intrusion-Detection/PhotoBlogServer`(이 저장소 clone)에서 동작. WSGI 설정 파일에서 `DJANGO_SECRET_KEY`(새 키)와 `DJANGO_DEBUG='False'`를 지정하고,
+> Web 탭 Static files로 `/static/` → `staticfiles`, `/media/` → `media`를 서빙한다 (Phase 7, 2026-11-07).
 
 ## 3. PhotoViewer (Android, Java 11)
 
@@ -83,7 +83,7 @@ PhotoViewer/app/src/main/
 | 에뮬레이터 → 로컬 Django | `http://10.0.2.2:8000` |
 | PythonAnywhere (기본값) | `https://hoynola.pythonanywhere.com` |
 
-> 현재 작업 트리는 로컬 테스트용 `http://10.0.2.2:8000` 상태다 (Phase 7 전에 Cloud로 되돌림).
+> 현재 값은 Cloud다 (Phase 4~6 로컬 테스트 후 Phase 7에서 복원).
 
 ## 4. YOLOv5
 

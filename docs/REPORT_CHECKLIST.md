@@ -43,11 +43,11 @@
 - [x] 에뮬레이터/실기기 캡처 — `../AI-Intrusion-Detection-docs/captures/phase6/ID7_앱_YOLO게시물_최신순.png` (보고서에 넣으면 끝) (수동 업로드 사진으로 대체 금지). 기본 목록은 오래된 순이므로 **최신순**을 눌러 YOLO 게시물이 위에 보이게 한다
 
 ### ID 8. PythonAnywhere `api_root`
-- [ ] `https://hoynola.pythonanywhere.com/api_root/Post/`에 YOLO 게시물 표시
+- [x] `https://hoynola.pythonanywhere.com/api_root/Post/`에 YOLO 게시물 표시 (2026-11-07 07:25~07:27 UTC 6건, 목록 끝부분)
 - [ ] 주소창 포함 캡처
 
 ### ID 9. PythonAnywhere 목록 및 이미지
-- [ ] `https://hoynola.pythonanywhere.com/`에서 YOLO 게시물 제목·이미지 표시
+- [x] `https://hoynola.pythonanywhere.com/`에서 YOLO 게시물 제목·이미지 표시 (맨 위 6건, 클립 배지)
 - [ ] 주소창 포함 캡처
 
 ### ID 10. 기타 기획되지 않은 편의 기능 (2개)
