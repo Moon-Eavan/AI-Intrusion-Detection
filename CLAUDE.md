@@ -10,7 +10,7 @@
 
 ## 현재 상태 (2026-11-07)
 
-- Phase 0 완료(Django 테스트 28 OK, Android 빌드·에뮬레이터 Cloud 동기화 확인), Phase 1 완료(YOLOv5 `e128e59`, ID 3 캡처), Phase 2 완료(`changedetection.py`, `detect.py` +7줄, ID 4 캡처), Phase 3 완료(웹캠 → 로컬 Django, `--conf-thres 0.5`로 중복 없음 확인), Phase 4 완료(기능 A, 웹캠 증빙), Phase 5 완료(기능 B, Django 테스트 50 OK, 웹캠 증빙), Phase 6 완료(로컬 최종 게시물·ID 7·Android 회귀), Phase 7 완료(PA 배포·Cloud YOLO 게시물·Android Cloud 확인, ID 8·9 브라우저 캡처는 사용자), `origin = Moon-Eavan/AI-Intrusion-Detection` (최신 커밋 `e5bd833`)
+- Phase 0 완료(Django 테스트 28 OK, Android 빌드·에뮬레이터 Cloud 동기화 확인), Phase 1 완료(YOLOv5 `e128e59`, ID 3 캡처), Phase 2 완료(`changedetection.py`, `detect.py` +7줄, ID 4 캡처), Phase 3 완료(웹캠 → 로컬 Django, `--conf-thres 0.5`로 중복 없음 확인), Phase 4 완료(기능 A, 웹캠 증빙), Phase 5 완료(기능 B, Django 테스트 50 OK, 웹캠 증빙), Phase 6 완료(로컬 최종 게시물·ID 7·Android 회귀), Phase 7 완료(PA 배포·Cloud YOLO 게시물·Android Cloud 확인·ID 8·9 캡처), Phase 8 진행(저장소 점검·보고서 초안 완료, Word 작성·ID 1 캡처·최종 push는 사용자), `origin = Moon-Eavan/AI-Intrusion-Detection` (최신 커밋 `f41162c`, PA도 동일)
 - `ApiConfig.BASE_URL`: 기본 `https://hoynola.pythonanywhere.com`, 로컬 에뮬레이터는 이 한 줄만 `http://10.0.2.2:8000`. 현재 Cloud 상태
 - ID 10 편의 기능 확정: A 원격 감시 설정(구현됨), B 이벤트 클립 녹화 + 보관 정책(구현됨) — `docs/EXTRA_FEATURES.md`. 이 외 기능을 임의로 추가하지 않는다
 - 진행 상황은 `docs/IMPLEMENTATION_PLAN.md`의 체크박스로 관리한다
@@ -25,7 +25,7 @@
 | 파일 구조 | `docs/PROJECT_STRUCTURE.md` |
 | ID 10 기능 A·B 설계 | `docs/EXTRA_FEATURES.md` |
 | Android 기존 기능·변경 범위 | `docs/ANDROID_FEATURES.md` |
-| 캡처·보고서 | `docs/REPORT_CHECKLIST.md` |
+| 캡처·보고서 | `docs/REPORT_CHECKLIST.md`, 보고서 문구 초안 `docs/REPORT_DRAFT.md` |
 
 ## 강의자료와 다른 코드 사실
 

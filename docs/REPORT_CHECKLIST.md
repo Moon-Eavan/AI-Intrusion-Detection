@@ -31,12 +31,12 @@
 - [x] VS Code에서 `detect.py` 추가 부분(5곳) 캡처 — `added (Ch08 p.11)`로 검색하면 5곳이 바로 보임. VS Code 소스 제어(Git) 탭의 diff 화면도 유용
 
 ### ID 5. 로컬 `api_root` (p.12)
-- [ ] `http://127.0.0.1:8000/api_root/Post/`에 YOLO 등록 게시물(title = 검출 클래스, image URL) 표시
-- [ ] 주소창 포함 캡처
+- [x] `http://127.0.0.1:8000/api_root/Post/`에 YOLO 등록 게시물(title = 검출 클래스, image URL) 표시 (Phase 6 게시물)
+- [x] 주소창 포함 캡처 (사용자, 2026-11-07)
 
 ### ID 6. 로컬 목록 및 이미지 (p.12)
-- [ ] `http://127.0.0.1:8000/`에서 YOLO 게시물 제목·이미지 표시
-- [ ] 주소창 포함 캡처
+- [x] `http://127.0.0.1:8000/`에서 YOLO 게시물 제목·이미지 표시 (Phase 6 게시물)
+- [x] 주소창 포함 캡처 (사용자, 2026-11-07)
 
 ### ID 7. 모바일 화면
 - [x] Android 동기화 후 **YOLO가 전송한 이미지**(ID 5·6 또는 ID 8·9와 같은 게시물) 표시 (2026-11-07, 로컬)
@@ -44,15 +44,15 @@
 
 ### ID 8. PythonAnywhere `api_root`
 - [x] `https://hoynola.pythonanywhere.com/api_root/Post/`에 YOLO 게시물 표시 (2026-11-07 07:25~07:27 UTC 6건, 목록 끝부분)
-- [ ] 주소창 포함 캡처
+- [x] 주소창 포함 캡처 (사용자, 2026-11-07)
 
 ### ID 9. PythonAnywhere 목록 및 이미지
 - [x] `https://hoynola.pythonanywhere.com/`에서 YOLO 게시물 제목·이미지 표시 (맨 위 6건, 클립 배지)
-- [ ] 주소창 포함 캡처
+- [x] 주소창 포함 캡처 (사용자, 2026-11-07)
 
 ### ID 10. 기타 기획되지 않은 편의 기능 (2개)
 
-정의·시나리오: `docs/EXTRA_FEATURES.md`. 보고서에는 서버/Edge/Android를 별도 행(10-1~10-6)으로 등록.
+정의·시나리오: `docs/EXTRA_FEATURES.md`. 아래 10-1~10-6은 **작업·증빙 파일 번호**다. 보고서 양식은 빈 행이 4개라 기능 × 서버/클라이언트 4행으로 합쳐 쓴다(대응표: `EXTRA_FEATURES.md` "보고서 행 구성", 문구 초안: `docs/REPORT_DRAFT.md`).
 
 **기능 A. 원격 감시 설정** — 증빙 파일: `../AI-Intrusion-Detection-docs/captures/phase4/` (2026-11-07 생성, 보고서에 넣으면 체크)
 - [x] 10-1 서버: 설정 API 응답 화면 (`http://127.0.0.1:8000/api_root/config/` — DRF 화면, 주소창 포함)

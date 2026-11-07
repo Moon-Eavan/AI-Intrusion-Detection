@@ -8,8 +8,8 @@ Phase 단위로 진행하고, 각 Phase의 확인 항목을 실제로 수행한 
 ## 현재 상태 (2026-11-07)
 
 - `PhotoBlogServer/`, `PhotoViewer/`: 공통평가 01 코드 복사, Phase 0 베이스라인 확인 완료.
-- `YOLOv5/`: upstream `e128e59` clone, `.git` 제거, venv 설치, 웹캠 기본 실행·ID 3 캡처 완료 (Phase 1). `changedetection.py` 작성·`detect.py` 5곳 수정, ID 4 캡처 완료 (Phase 2). 웹캠 → 로컬 Django 연동 확인 완료 (Phase 3, `--conf-thres 0.5`). 기능 A 구현·웹캠 증빙 완료 (Phase 4). 기능 B 구현·웹캠 증빙 완료 (Phase 5). Phase 6 로컬 최종 게시물 생성·ID 7·회귀 확인 완료. Phase 7 PythonAnywhere 배포·Cloud YOLO 게시물·Android Cloud 확인 완료, ID 8·9 브라우저 캡처는 사용자. 다음: Phase 8
-- Git: `main` 브랜치, 최신 `e5bd833 fix: remove trailing comma from detection post text` (YOLOv5 일반 파일 141개로 추적), `origin = git@github.com:Moon-Eavan/AI-Intrusion-Detection.git`
+- `YOLOv5/`: upstream `e128e59` clone, `.git` 제거, venv 설치, 웹캠 기본 실행·ID 3 캡처 완료 (Phase 1). `changedetection.py` 작성·`detect.py` 5곳 수정, ID 4 캡처 완료 (Phase 2). 웹캠 → 로컬 Django 연동 확인 완료 (Phase 3, `--conf-thres 0.5`). 기능 A 구현·웹캠 증빙 완료 (Phase 4). 기능 B 구현·웹캠 증빙 완료 (Phase 5). Phase 6 로컬 최종 게시물 생성·ID 7·회귀 확인 완료. Phase 7 PythonAnywhere 배포·Cloud YOLO 게시물·Android Cloud 확인·ID 8·9 캡처 완료. Phase 8 저장소 점검·보고서 초안 완료, 보고서 작성·ID 1 캡처·최종 push는 사용자
+- Git: `main` 브랜치, 최신 `f41162c chore: deploy to PythonAnywhere and restore cloud BASE_URL` (origin과 동일, PA도 같은 커밋) (YOLOv5 일반 파일 141개로 추적), `origin = git@github.com:Moon-Eavan/AI-Intrusion-Detection.git`
 - ID 10 기능 확정: A 원격 감시 설정(구현됨), B 이벤트 클립 녹화 + 보관 정책(구현됨) — `docs/EXTRA_FEATURES.md`
 - `ApiConfig.BASE_URL` = Cloud(`https://hoynola.pythonanywhere.com`)로 복원 (Phase 7). 로컬 테스트 때만 `http://10.0.2.2:8000`
 - PythonAnywhere: `/home/hoynola/AI-Intrusion-Detection/PhotoBlogServer`에서 이 저장소 코드로 동작, `DEBUG=False`, 새 `SECRET_KEY`(WSGI 파일 환경변수). 이전 `~/Mobile-Webservice`는 되돌리기용으로 남겨 둠
@@ -116,11 +116,11 @@ python detect.py --source 0     # ← ID 3 (사용자)
 - [x] 증빙 파일: `../AI-Intrusion-Detection-docs/captures/phase5/` (YOLO 로그 10-4, API 응답 10-5, 앱 화면 4장 10-6). 웹 캡처 10-5는 사용자
 - [x] (Phase 5 커밋 후, 사용자 요청) 게시물 `text` 끝 쉼표 제거: `"person, "` → `"person"`, 녹화 중 병합은 `", "`로 연결. 테스트 영상으로 `'person, bus, tie'`, `'person, bus'` 확인
 
-## Phase 6 — 로컬 최종 캡처 (ID 5·6·7) (2026-11-07)
+## Phase 6 — 로컬 최종 캡처 (ID 5·6·7) ✅ (2026-11-07)
 
 - [x] YOLO 실행해 새 검출 게시물 생성 (웹캠, 대상 person·cell phone, 대기 10초): 8건(`person` 7, `cell phone` 1), 모두 클립 포함, `text` 끝 쉼표 없는 새 형식. 로컬 DB 50건. 이후 감시 설정 기본값 복원
-- [ ] `http://127.0.0.1:8000/api_root/Post/` 캡처 (ID 5) — 사용자 (목록 끝부분에 2026-11-07 06:58~06:59 UTC 게시물)
-- [ ] `http://127.0.0.1:8000/` 목록·이미지 캡처 (ID 6) — 사용자 (맨 위 8건)
+- [x] `http://127.0.0.1:8000/api_root/Post/` 캡처 (ID 5) — 사용자 완료 (목록 끝부분에 2026-11-07 06:58~06:59 UTC 게시물)
+- [x] `http://127.0.0.1:8000/` 목록·이미지 캡처 (ID 6) — 사용자 완료 (맨 위 8건)
 - [x] Android(`BASE_URL = http://10.0.2.2:8000`, Phase 5 빌드) 동기화 → **최신순** → YOLO 게시물·클립 배지 캡처 (ID 7) — `../AI-Intrusion-Detection-docs/captures/phase6/ID7_앱_YOLO게시물_최신순.png`
 - [x] 기존 Android 기능 회귀 확인 (에뮬레이터, adb 조작)
   - 동기화 50건 / 검색 "cell" → 14건 / 오래된순(2026-10-08 글)·최신순(오늘 YOLO 글) / 즐겨찾기 등록 → 필터 1개 → 해제
@@ -129,7 +129,7 @@ python detect.py --source 0     # ← ID 3 (사용자)
   - 오프라인 캐시: Phase 5에서 일시 연결 실패 시 캐시 37건 표시 확인
   - 조작 중 키보드가 닫힌 상태에서 BACK을 보내 앱이 한 번 종료됨(테스트 조작 실수, 앱 문제 아님)
 
-## Phase 7 — PythonAnywhere (ID 8·9) (2026-11-07)
+## Phase 7 — PythonAnywhere (ID 8·9) ✅ (2026-11-07)
 
 배포 전 Cloud는 공통평가 01 코드(`~/Mobile-Webservice`, SECRET_KEY 하드코딩·`DEBUG = True`, 게시물 9건, `/api_root/config/` 404)였다.
 배포 방식: 새 저장소를 PA에 clone하고 웹앱 경로를 옮김 (기존 폴더는 되돌리기용으로 유지).
@@ -153,13 +153,17 @@ pip install -r requirements.txt && python manage.py migrate && python manage.py 
   - Cloud 클립 `video/mp4` 200. PA static 서버는 Range 요청에 206이 아닌 200 전체 응답 → faststart로 Chrome·Android 재생 가능, Safari는 재생 안 될 수 있음
 - [x] Android `BASE_URL` Cloud로 복원·재빌드 → 동기화 15건, 클립 배지, 상세 클립 재생(00:05/00:06), 감시 설정 화면(대상 2개·대기 10 로드), Edge 상태 표시 확인. 이후 Cloud 감시 설정 기본값 복원
 - [x] 증빙 파일: `../AI-Intrusion-Detection-docs/captures/phase7/` (Cloud 앱 목록·클립 재생·감시 설정)
-- [ ] Cloud `api_root` 캡처 (ID 8), 웹 목록·이미지 캡처 (ID 9) — 사용자
+- [x] Cloud `api_root` 캡처 (ID 8), 웹 목록·이미지 캡처 (ID 9) — 사용자 완료
+- [x] 커밋 `f41162c` push 후 PA에서 `git pull` + Reload (사용자) → 외부 재확인: 페이지·API·설정 API·CSS 200, 클립 `video/mp4` 200, 게시물 15건, 404 정상
 - [ ] (선택) Cloud `media/` 사용량: PA 콘솔에서 `du -sh ~/AI-Intrusion-Detection/PhotoBlogServer/media` (이번 클립 6개 약 0.5MB, 상한 200MB)
 
 ## Phase 8 — 제출 (ID 1·2)
 
-- [ ] 루트에 `PhotoBlogServer/`, `PhotoViewer/`, `YOLOv5/`, 보고서 `.docx` 확인 → 폴더 구조 캡처 (ID 1)
-- [ ] 비밀값·개인 사진·`db.sqlite3`·`media/`·`runs/`·모델 가중치가 추적되지 않는지 `git status`로 확인
-- [ ] 커밋 및 `origin`에 push, GitHub 웹에서 구조 확인 (ID 2)
-- [ ] Word 보고서 작성(학번·이름, 완료 여부, 적/부, 캡처 내장, ID 10 행 구성) 후 다시 커밋·push
+- [x] 루트에 `PhotoBlogServer/`, `PhotoViewer/`, `YOLOv5/`, 보고서 `.docx` 확인 (2026-11-07, 그 외 `docs/`, `tools/`, `README.md`, `CLAUDE.md`, `.gitignore`)
+- [ ] 폴더 구조 캡처 (ID 1) — 사용자 (Finder 또는 GitHub 루트)
+- [x] 추적 파일·전체 히스토리 점검: `db.sqlite3`·`media/`·`runs/`·`*.pt`·`venv/`·`.env`·`*.mp4`·`local.properties` 없음, 실제 비밀키 없음(히스토리의 `password = 'password'`는 `docs/ch08.md` 강의 예제 원문, 테스트용 `unused-pw`, upstream YOLOv5 CI의 `secrets.*` 참조뿐). 추적 이미지는 upstream 샘플 `bus.jpg`·`zidane.jpg`만. 259개 파일
+- [x] GitHub 확인 (API): 루트 구조 일치, `YOLOv5/`는 일반 폴더(tree, gitlink 아님)이고 `detect.py`·`changedetection.py`·`monitorconfig.py`·`cliprecorder.py` 포함
+- [x] 보고서 양식 확인: 표는 ID 1~10 + 빈 행 4개, 아직 미작성 → ID 10을 기능 × 서버/클라이언트 4행으로 쓰기로 정리, 초안 `docs/REPORT_DRAFT.md` 작성
+- [ ] Word 보고서 작성(학번·이름, 완료 여부, 적/부, 캡처 내장, ID 10 4행) — 사용자
+- [ ] 보고서 `.docx` 최종본 커밋·push, GitHub에서 재확인
 - [ ] GitHub URL 제출
