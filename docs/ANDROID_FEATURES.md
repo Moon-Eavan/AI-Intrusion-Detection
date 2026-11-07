@@ -41,7 +41,7 @@ ID 10 기능 정의 전체는 `docs/EXTRA_FEATURES.md`. Android 변경 범위만
 
 | 기능 | Android 변경 |
 | --- | --- |
-| A. 원격 감시 설정 | `SettingsActivity` 신규 (감시 ON/OFF, 대상 클래스, 신뢰도, 쿨다운 → `PATCH /api_root/config/`), `MainActivity`에 설정 버튼·Edge 온라인 표시 |
+| A. 원격 감시 설정 (구현됨) | `SettingsActivity`·`MonitorConfigApi` 신규 (감시 ON/OFF, 대상 클래스 칩, 신뢰도 Slider, 재등록 대기시간 → `PUT /api_root/config/`, `HttpURLConnection`은 PATCH 미지원), `MainActivity` 상단에 Edge 상태 줄(5초 갱신)·"감시 설정" 버튼 |
 | B. 이벤트 클립 녹화 | `PostItem`에 `clipUrl`·`clipExpired`, 목록 클립 표시, `DetailActivity`에서 `VideoView` 재생 |
 
 - Room DB(v2) 스키마는 바꾸지 않는다. 오프라인 캐시에는 클립 정보가 없다.

@@ -7,7 +7,7 @@ YOLOv5로 카메라 영상에서 객체 출현을 감지하고, 검출 이미지
 - REST API: <https://hoynola.pythonanywhere.com/api_root/Post/>
 - Django 서버와 Android 앱은 공통평가 01 저장소 [Mobile-Webservice](https://github.com/Moon-Eavan/Mobile-Webservice)의 코드를 재사용합니다.
 
-> **진행 상태 (2026-11-04):** Phase 0~2 완료 — YOLOv5 기본 검출(ID 3), `changedetection.py`·`detect.py` 연동(ID 4). Phase 3 완료 — 웹캠 → 로컬 Django 자동 등록 확인. 다음: 기능 A 원격 감시 설정(Phase 4).
+> **진행 상태 (2026-11-07):** Phase 0~3 완료 — YOLOv5 기본 검출(ID 3), `changedetection.py`·`detect.py` 연동(ID 4), 웹캠 → 로컬 Django 자동 등록 확인. Phase 4 완료 — 기능 A 원격 감시 설정 구현·웹캠 증빙. 다음: 기능 B 이벤트 클립 녹화(Phase 5).
 > 단계별 상태는 [`docs/IMPLEMENTATION_PLAN.md`](docs/IMPLEMENTATION_PLAN.md)를 참고하세요.
 
 ## Architecture
@@ -55,6 +55,9 @@ AI-Intrusion-Detection/
 | --- | --- | --- |
 | `GET` | `/api_root/Post/` | 게시물 목록 JSON (`author, title, text, created_date, published_date, image`) |
 | `POST` | `/api_root/Post/` | multipart `title`, `text`, `image` 등록 (`author`는 서버가 지정) |
+| `GET` | `/api_root/config/` | 원격 감시 설정 + Edge 상태 (`enabled, target_classes, conf_threshold, cooldown_sec, available_classes, edge_last_seen, edge_online, edge_seen_sec`) |
+| `PUT` / `PATCH` | `/api_root/config/` | 감시 설정 변경 (Android는 PUT) |
+| `POST` | `/api_root/config/edge/` | YOLO Edge heartbeat (`available_classes` 등록), 응답 = 현재 설정 |
 | `GET` | `/` | 웹 게시물 목록 |
 | `GET` | `/post/<id>/` | 웹 게시물 상세 |
 | `GET` | `/admin/` | Django 관리자 |
@@ -96,11 +99,11 @@ macOS에서 `not authorized to capture video` / `Failed to open 0`이 나오면 
 `changedetection.py` 연동 후에는 서버 주소를 환경변수로 지정해 실행합니다.
 
 ```bash
-PHOTOBLOG_HOST=http://127.0.0.1:8000 python detect.py --source 0 --conf-thres 0.5              # 로컬
-PHOTOBLOG_HOST=https://hoynola.pythonanywhere.com python detect.py --source 0 --conf-thres 0.5 # Cloud
+PHOTOBLOG_HOST=http://127.0.0.1:8000 python detect.py --source 0              # 로컬
+PHOTOBLOG_HOST=https://hoynola.pythonanywhere.com python detect.py --source 0 # Cloud
 ```
 
-기본 임계값 0.25에서는 배경 물체 오검출이 프레임마다 깜빡여 같은 클래스가 반복 등록되므로 `--conf-thres 0.5`를 사용합니다. 연동 방법은 [`docs/YOLOV5_INTEGRATION.md`](docs/YOLOV5_INTEGRATION.md).
+YOLO는 5초마다 서버의 감시 설정(`/api_root/config/`)을 받아 적용합니다. 신뢰도 임계값은 서버 설정(기본 0.5)이 걸러 주므로 `--conf-thres`는 주지 않습니다(기본 0.25에서는 배경 오검출이 깜빡여 같은 클래스가 반복 등록됨). 설정 API가 없거나 연결이 안 되면 기본값(전체 클래스, 0.5)으로 계속 검출합니다. 연동 방법은 [`docs/YOLOV5_INTEGRATION.md`](docs/YOLOV5_INTEGRATION.md).
 
 ### 3. Android Client
 
@@ -109,6 +112,7 @@ PHOTOBLOG_HOST=https://hoynola.pythonanywhere.com python detect.py --source 0 --
    - Cloud (기본): `https://hoynola.pythonanywhere.com`
    - 에뮬레이터 → 로컬 서버: `http://10.0.2.2:8000`
 3. 실행 후 동기화 버튼을 누르면 YOLO가 등록한 게시물과 이미지가 목록에 표시됩니다.
+4. 상단에 YOLO Edge 접속 상태가 표시되고, **감시 설정**에서 감시 ON/OFF·대상 클래스·신뢰도·재등록 대기시간을 바꿀 수 있습니다.
 
 ## 공통평가 02 제출 항목
 
@@ -130,7 +134,7 @@ PHOTOBLOG_HOST=https://hoynola.pythonanywhere.com python detect.py --source 0 --
 | **원격 감시 설정** | Android에서 감시 ON/OFF, 감시 대상 클래스(COCO 80개 중 선택), 신뢰도 임계값, 재등록 대기시간을 바꾸면 YOLO Edge가 polling으로 수 초 내 반영. 앱에서 Edge 온라인 상태 확인 |
 | **이벤트 클립 녹화 + 보관 정책** | 객체 출현 시 감지 전후 3초를 H.264 클립으로 만들어 게시물과 함께 업로드, 웹·Android에서 재생. 클립 총용량이 상한(기본 200MB)을 넘으면 오래된 클립부터 자동 삭제 |
 
-설계: [`docs/EXTRA_FEATURES.md`](docs/EXTRA_FEATURES.md) (구현 예정)
+설계·구현: [`docs/EXTRA_FEATURES.md`](docs/EXTRA_FEATURES.md) (원격 감시 설정 구현됨, 클립 녹화 구현 예정)
 
 상세 기준은 [`docs/ASSIGNMENT.md`](docs/ASSIGNMENT.md), 캡처 체크리스트는 [`docs/REPORT_CHECKLIST.md`](docs/REPORT_CHECKLIST.md).
 

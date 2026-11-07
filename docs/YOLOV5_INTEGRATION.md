@@ -1,13 +1,14 @@
 # YOLOv5 ↔ Django ↔ Android 연동 가이드
 
 강의자료 원문 코드는 `docs/ch08.md`에 있다. 이 문서는 그 코드를 **현재 저장소의 Django API에 맞게 적용하는 방법**을 정리한 설계 노트다.
-`YOLOv5/`는 upstream `e128e59`(2026-11-01)로 설치됐고(Phase 1), §3·§4의 강의 기반 연동은 Phase 2에서 구현했다(`YOLOv5/changedetection.py`, `detect.py` +7줄). ID 10 기능(§1의 설정·클립)은 아직 구현 전이다.
+`YOLOv5/`는 upstream `e128e59`(2026-11-01)로 설치됐고(Phase 1), §3·§4의 강의 기반 연동은 Phase 2에서 구현했다(`YOLOv5/changedetection.py`, `detect.py` +7줄). ID 10 기능 A(원격 감시 설정)는 Phase 4에서 `monitorconfig.py` + `detect.py` 2줄 + `changedetection.py` 조건 추가로 구현했다(`docs/EXTRA_FEATURES.md`). 기능 B(클립)는 구현 전이다.
 
 ## 1. 데이터 흐름
 
 ```text
 카메라(--source 0)
-  → detect.py: 프레임마다 추론, 클래스별 detected[0/1] 계산
+  → detect.py: 프레임마다 추론, 감시 대상·신뢰도 필터(ID 10 A) 통과한 박스만 detected[0/1] 계산
+       ↑ monitorconfig.py: 5초마다 POST {HOST}/api_root/config/edge/ → 감시 설정 수신
   → changedetection.py: 이전 상태와 비교, 0→1 변화가 있을 때만
        └ runs/detect/expN/detected/YYYY/M/D/*.jpg 저장 (320×240)
        └ POST {HOST}/api_root/Post/  (multipart: title, text, image)
@@ -68,7 +69,8 @@ Phase 2 구현에서 위 표의 처리를 모두 적용했다. 서버 통신 결
 
 - 같은 클래스 객체가 여러 개여도 상태는 0/1 하나다 → 개수·개별 추적·신원 식별은 하지 않는다.
 - 객체가 계속 화면에 있으면 다시 보내지 않고, 사라졌다(0) 다시 나타나면(1) 새 게시물을 만든다.
-- 검출이 프레임마다 깜빡이면 짧은 간격으로 중복 등록될 수 있다. **실측(Phase 3):** 기본 `--conf-thres 0.25`에서 약 75초에 58건(옷장 문 → `refrigerator 0.30` 등 배경 오검출), `--conf-thres 0.5`에서는 약 50초에 4건으로 시나리오와 일치. 웹캠 실행은 `--conf-thres 0.5`를 표준으로 한다.
+- 검출이 프레임마다 깜빡이면 짧은 간격으로 중복 등록될 수 있다. **실측(Phase 3):** 기본 `--conf-thres 0.25`에서 약 75초에 58건(옷장 문 → `refrigerator 0.30` 등 배경 오검출), `--conf-thres 0.5`에서는 약 50초에 4건으로 시나리오와 일치.
+- 기능 A 이후에는 서버 `conf_threshold`(기본 0.5)가 같은 역할을 하므로 `--conf-thres`를 주지 않는다. CLI 값은 NMS 단계에서 먼저 걸러 내므로, 0.5를 주면 앱에서 0.5 아래로 낮춰도 효과가 없다.
 - `title`은 이번 프레임에 새로 나타난 클래스 중 **마지막** 것, `text`는 새로 나타난 클래스 전체(`"person, cell phone, "`)다.
 
 ## 6. 로컬 / Cloud 전환

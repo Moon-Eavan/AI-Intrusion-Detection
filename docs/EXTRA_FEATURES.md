@@ -5,7 +5,8 @@
 | A | 원격 감시 설정 | Django + YOLOv5 + Android |
 | B | 이벤트 클립 녹화 + 보관 정책 | YOLOv5 + Django + Android |
 
-두 기능 모두 **구현 전(설계 단계)** 이다. 아래 값(주기, 길이, 상한 등)은 기본안이며 구현 중 조정할 수 있다.
+- 기능 A: **구현·웹캠 증빙 완료 (Phase 4, 2026-11-07)**. 구현하며 바뀐 점은 "구현" 절, 결과는 "구현 확인 결과"·"증빙 결과"에 적었다.
+- 기능 B: 설계 단계. 아래 값(길이, 상한 등)은 기본안이며 구현 중 조정할 수 있다.
 PythonAnywhere 무료 계정은 서버 → Edge 방향 연결(push, WebSocket)이 안 되므로 **Edge가 서버를 polling**하는 구조를 쓴다.
 
 ---
@@ -22,33 +23,55 @@ Android 앱에서 YOLO Edge의 감시 동작(ON/OFF, 감시 대상 클래스, �
 | --- | --- | --- | --- |
 | `enabled` | bool / `true` | Switch | `false`면 검출 화면은 유지, 서버 전송(`cd.add`)만 중단 |
 | `target_classes` | 클래스명 리스트 / `[]` (= 전체) | 체크 목록 | 목록에 없는 클래스는 `detected`에 1로 표시하지 않음 |
-| `conf_threshold` | float / `0.25` (범위 0.25~0.90) | SeekBar | `conf`가 임계값 미만인 박스 무시. `detect.py` 기본 `--conf-thres 0.25`보다 낮추는 것은 무의미 |
-| `cooldown_sec` | int / `0` | 숫자 입력 | 같은 클래스는 마지막 등록 후 이 시간 안에 재출현해도 등록하지 않음 |
-| `available_classes` | 리스트 (Edge가 등록) | 체크 목록의 항목 | Edge 시작 시 모델 `names`(COCO 80개)를 서버에 올림 |
-| `edge_last_seen` | datetime (서버가 기록) | "Edge 온라인 / n초 전" 표시 | Edge가 polling할 때 서버가 현재 시각 기록 |
+| `conf_threshold` | float / `0.5` (범위 0.25~0.90) | Slider (0.05 단위) | `conf`가 임계값 미만인 박스 무시(박스도 그리지 않음). 기본 0.5는 Phase 3 실측 표준값. `detect.py`는 `--conf-thres` 없이(기본 0.25) 실행해야 앱에서 0.25까지 낮출 수 있다 |
+| `cooldown_sec` | int / `0` (0~3600) | 숫자 입력 | 같은 클래스는 마지막 등록 후 이 시간 안에 재출현해도 등록하지 않음 |
+| `available_classes` | 리스트 (Edge가 등록) | 클래스 칩 목록 | Edge가 heartbeat 때 모델 `names`(COCO 80개)를 서버에 올림 |
+| `edge_last_seen` | datetime (서버가 기록) | — | Edge heartbeat 때 서버가 현재 시각 기록 |
+| `edge_online`, `edge_seen_sec` | 응답 전용 (서버 계산) | "Edge 온라인 · n초 전" | 마지막 heartbeat가 15초 이내면 온라인. 서버 시각으로 계산해 휴대폰 시계 차이 영향 없음 |
 
 감시 대상은 새 클래스를 학습하는 것이 아니라 **YOLOv5 기본 모델이 이미 인식하는 80개 COCO 클래스 중에서 고르는 필터**다.
 
 ### 구현
 
-**Django**
-- `MonitorConfig` 모델(행 1개만 사용, 없으면 기본값으로 생성), serializer
-- `GET /api_root/config/` — 현재 설정 (Android, Edge)
-- `PATCH /api_root/config/` — 설정 변경 (Android)
-- `POST /api_root/config/edge/` — Edge 등록·heartbeat (`available_classes` 전송, 서버가 `edge_last_seen = now`)
-- `edge_last_seen`, `available_classes`는 PATCH로 바꿀 수 없게 read-only
+**Django** (`blog/models.py`, `serializers.py`, `views.py`, `urls.py`, migration `0002_monitorconfig`)
+- `MonitorConfig` 모델(행 1개 pk=1만 사용, `MonitorConfig.load()`가 없으면 기본값으로 생성), admin 등록
+- `GET /api_root/config/` — 현재 설정
+- `PUT`/`PATCH /api_root/config/` — 설정 변경. **Android는 PUT 사용**(`HttpURLConnection`이 PATCH 미지원)
+- `POST /api_root/config/edge/` — Edge heartbeat. `available_classes`(JSON) 등록, `edge_last_seen = now`, **응답으로 현재 설정을 돌려줌** → Edge는 polling 1회에 요청 1번
+- 검증: `conf_threshold` 0.25~0.9, `cooldown_sec` 0~3600, `target_classes`는 문자열 리스트이며 `available_classes`에 있는 이름만 허용. `available_classes`·`edge_last_seen`은 PUT/PATCH로 못 바꿈 → 위반 시 400
+- 테스트 12개 추가 (`MonitorConfigApiTests`)
 
-**YOLOv5**
-- 백그라운드 스레드가 5초마다 `POST /config/edge/` → `GET /config/`, 받은 설정을 공유 객체에 저장(lock)
-- 서버 연결 실패 시 마지막 설정 유지, 검출 계속
-- `detect.py`의 `detected[int(cls)] = 1` 앞에 클래스·신뢰도 필터, `cd.add` 앞에 `enabled` 확인
-- `ChangeDetection`에 클래스별 마지막 등록 시각을 두고 `cooldown_sec` 적용
-- 설정이 바뀌면 콘솔에 변경 내용 출력 (증빙용)
+**YOLOv5** (`monitorconfig.py` 신규, `changedetection.py`·`detect.py` 수정)
+- `MonitorConfig`(Edge 쪽 클래스): 시작 시 1회 + 백그라운드 daemon 스레드가 5초마다 heartbeat, 응답 설정을 lock으로 보관
+- 서버 연결 실패·설정 API 없는 서버(404)면 마지막 설정(처음엔 기본값: 전체 클래스, 0.5, 대기 0) 유지, 검출 계속. 실패/복구는 상태가 바뀔 때만 출력
+- `detect.py` 박스 루프 맨 앞에 2줄: `cd.config.accept(클래스명, conf)`가 False면 `continue` → `detected`에 반영하지 않고 **박스도 그리지 않음**(서버로 가는 사진에 대상 외 박스가 없음)
+- `changedetection.py`: 0→1 판정 줄에 `self.allowed(names, i)` 조건 추가. 감시 OFF면 미등록, 클래스별 마지막 등록 시각으로 `cooldown_sec` 적용. OFF 동안에도 `result_prev`(검출 상태)는 갱신하므로 다시 켤 때 이미 화면에 있던 객체가 한꺼번에 등록되지 않음
+- 콘솔 로그(증빙용): `MonitorConfig: 서버 연결됨`, `MonitorConfig: 설정 반영 target_classes=['person']`, `ChangeDetection: 감시 OFF - person 미등록`, `ChangeDetection: 재등록 대기 중 - bus 미등록`
 
-**Android**
-- `SettingsActivity`: Switch, 클래스 체크 목록(`available_classes` 기반), SeekBar, 쿨다운 입력, 저장 → PATCH
-- `MainActivity`: 설정 화면 진입 버튼, Edge 상태 표시 (`edge_last_seen`이 15초 이내면 온라인)
-- 서버 주소는 기존 `ApiConfig.BASE_URL` 사용
+**Android** (`SettingsActivity`·`MonitorConfigApi` 신규, `MainActivity` 수정)
+- `SettingsActivity`: Edge 상태 박스(5초 갱신), 감시 ON/OFF `MaterialSwitch`, 신뢰도 `Slider`(내부 정수 25~90, 화면 0.xx), 재등록 대기시간 입력, 감시 대상 칩 80개(`available_classes`, 선택 없음 = 전체), 저장 → PUT
+- `MainActivity`: 상단에 "● Edge 온라인 · n초 전 · 감시 ON" 줄(화면이 보이는 동안 5초마다 갱신)과 "감시 설정" 버튼
+- `MonitorConfigApi`: GET/PUT 공용 코드, 400이면 서버 검증 메시지 표시. 서버 주소는 기존 `ApiConfig.BASE_URL` 사용
+
+### 구현 확인 결과 (2026-11-06)
+
+- Django: `python manage.py test blog` 40개 OK (기존 28 + 신규 12). 작성 중 음수 `cooldown_sec`가 400이 아닌 DB 오류(500)가 되는 문제를 테스트로 발견 → 모델에 `MinValueValidator(0)` 추가
+- Edge (샘플 이미지 + 임시 서버 복사본): 기본 → `bus` 등록 / 대상 `person`만 → `person`만 등록, 사진에 bus 박스 없음 / OFF → 0건 + `감시 OFF` 로그 / 대기 60초 → bus→zidane→bus에서 두 번째 bus `재등록 대기 중` / 임계값 0.9 → 0건 / 서버 없음 → `서버 연결 실패, 마지막 설정 유지` 후 검출 계속 / 실행 중 PATCH → 5.1초 뒤 반영
+- Android (에뮬레이터 + 로컬 서버): 메인 상단 Edge 온라인/오프라인 표시, 설정 화면 로드, 대상 person·임계값 0.6·대기 10초 저장 → 서버 값 일치. 첫 구현의 소수 Slider(stepSize 0.05)가 0.57처럼 단계에 맞지 않는 문제 → 정수 % Slider로 수정
+
+### 증빙 결과 (웹캠, 2026-11-07)
+
+| 시나리오 | 설정 | 결과 |
+| --- | --- | --- |
+| 시작 직후 | 대상 전체, 0.5, 대기 0 | 약 30초에 18건 (chair·toilet·cell phone 깜빡임) |
+| 1 | 대상 `person` | `person` 5건, `cell phone` 0건, 사진에 사람 박스만 |
+| 2 | + `cell phone` | `cell phone` 등록. 휴대폰을 움직이자 6초에 9건 |
+| 2-1 | + 재등록 대기 30초 | 같은 동작에 `cell phone` 1건, 7회 `재등록 대기 중` 로그 |
+| 3 | 감시 OFF | 0건, `감시 OFF - … 미등록` 로그, 앱 "감시 OFF" |
+| 4 | YOLO 종료 | 약 20초 후 앱 "Edge 오프라인 · 20초 전" |
+
+신뢰도 0.5만으로도 이동하는 물체·배경 물체는 깜빡여 중복 등록되며, 대상 클래스와 재등록 대기시간을 함께 써야 한다는 것을 실측으로 확인했다.
+증빙 파일: `../AI-Intrusion-Detection-docs/captures/phase4/`
 
 ### 도입 근거 (Phase 3 관측, 2026-11-04)
 
@@ -61,6 +84,8 @@ Android 앱에서 YOLO Edge의 감시 동작(ON/OFF, 감시 대상 클래스, �
 - Edge 1대를 가정한다(설정 1개).
 
 ### 증빙 시나리오
+
+웹캠 실행: `PHOTOBLOG_HOST=http://127.0.0.1:8000 venv/bin/python -u detect.py --source 0` (`--conf-thres` 없이, 임계값은 앱에서)
 
 1. Android 설정 화면에서 대상 = `person`만 선택
 2. Edge 콘솔의 설정 반영 로그

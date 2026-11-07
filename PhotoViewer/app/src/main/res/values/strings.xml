@@ -34,4 +34,21 @@
     <string name="action_pick_image">사진 선택</string>
     <string name="action_upload">업로드</string>
     <string name="action_cancel">취소</string>
+
+    <!-- ID 10 기능 A: 원격 감시 설정 -->
+    <string name="action_monitor_settings">감시 설정</string>
+    <string name="edge_status_loading">Edge 상태 확인 중…</string>
+    <string name="settings_screen_title">원격 감시 설정</string>
+    <string name="label_monitor_enabled">감시 ON/OFF</string>
+    <string name="desc_monitor_enabled">끄면 Edge는 검출만 하고 게시물을 등록하지 않습니다.</string>
+    <string name="label_conf_threshold">신뢰도 임계값</string>
+    <string name="desc_conf_threshold">이 값보다 낮은 신뢰도의 검출은 무시합니다. 높일수록 오검출이 줄어듭니다.</string>
+    <string name="label_cooldown">재등록 대기시간</string>
+    <string name="desc_cooldown">같은 객체가 등록된 뒤 이 시간 안에 다시 나타나면 등록하지 않습니다. 0이면 사용 안 함.</string>
+    <string name="label_target_classes">감시 대상</string>
+    <string name="desc_target_classes">아무것도 선택하지 않으면 모든 객체를 감시합니다.</string>
+    <string name="desc_no_available_classes">Edge(detect.py)가 아직 접속하지 않아 클래스 목록이 없습니다. 지금은 모든 객체를 감시합니다.</string>
+    <string name="action_clear_targets">전체 해제</string>
+    <string name="action_save_settings">저장</string>
+    <string name="settings_saved">저장했습니다. Edge에 5초 안에 반영됩니다.</string>
 </resources>

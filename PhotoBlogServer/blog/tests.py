@@ -1,14 +1,16 @@
 import tempfile
+from datetime import timedelta
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
 from django.urls import reverse
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from .models import Post
+from .models import MonitorConfig, Post
 
 # Django test runner는 settings.DATABASES와 별개로 전용 테스트 DB를 새로 만들고
 # 테스트가 끝나면 삭제하므로, 여기서 만드는 데이터는 실제 db.sqlite3(수동/운영 데이터)와
@@ -305,3 +307,97 @@ class PostWebViewTests(TestCase):
         self.login()
         response = self.client.get(reverse('post_edit', args=[999999]))
         self.assertEqual(response.status_code, 404)
+
+
+class MonitorConfigApiTests(APITestCase):
+    """GET/PATCH /api_root/config/, POST /api_root/config/edge/ (ID 10 기능 A)."""
+
+    CONFIG_URL = '/api_root/config/'
+    EDGE_URL = '/api_root/config/edge/'
+    CLASSES = ['person', 'bicycle', 'cell phone']
+
+    def test_get_creates_default_config(self):
+        response = self.client.get(self.CONFIG_URL)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['enabled'], True)
+        self.assertEqual(response.data['target_classes'], [])
+        self.assertEqual(response.data['conf_threshold'], 0.5)
+        self.assertEqual(response.data['cooldown_sec'], 0)
+        self.assertFalse(response.data['edge_online'])
+        self.assertIsNone(response.data['edge_seen_sec'])
+        self.assertEqual(MonitorConfig.objects.count(), 1)
+
+    def test_patch_updates_settings(self):
+        self.client.post(self.EDGE_URL, {'available_classes': self.CLASSES}, format='json')
+        response = self.client.patch(self.CONFIG_URL, {
+            'enabled': False, 'target_classes': ['person'], 'conf_threshold': 0.7, 'cooldown_sec': 30,
+        }, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        config = MonitorConfig.load()
+        self.assertFalse(config.enabled)
+        self.assertEqual(config.target_classes, ['person'])
+        self.assertEqual(config.conf_threshold, 0.7)
+        self.assertEqual(config.cooldown_sec, 30)
+
+    def test_patch_conf_threshold_out_of_range_returns_400(self):
+        for value in (0.1, 0.95):
+            response = self.client.patch(self.CONFIG_URL, {'conf_threshold': value}, format='json')
+            self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(MonitorConfig.load().conf_threshold, 0.5)
+
+    def test_patch_negative_cooldown_returns_400(self):
+        response = self.client.patch(self.CONFIG_URL, {'cooldown_sec': -1}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_patch_unknown_target_class_returns_400(self):
+        self.client.post(self.EDGE_URL, {'available_classes': self.CLASSES}, format='json')
+        response = self.client.patch(self.CONFIG_URL, {'target_classes': ['dragon']}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_patch_target_classes_must_be_string_list(self):
+        response = self.client.patch(self.CONFIG_URL, {'target_classes': 'person'}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_patch_cannot_change_edge_fields(self):
+        self.client.patch(self.CONFIG_URL, {
+            'available_classes': ['hacked'], 'edge_last_seen': '2026-01-01T00:00:00Z',
+        }, format='json')
+        config = MonitorConfig.load()
+        self.assertEqual(config.available_classes, [])
+        self.assertIsNone(config.edge_last_seen)
+
+    def test_put_updates_all_settings(self):
+        # Android는 PATCH를 쓸 수 없어 PUT으로 전체 필드를 보낸다
+        response = self.client.put(self.CONFIG_URL, {
+            'enabled': False, 'target_classes': [], 'conf_threshold': 0.6, 'cooldown_sec': 5,
+        }, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        config = MonitorConfig.load()
+        self.assertFalse(config.enabled)
+        self.assertEqual(config.conf_threshold, 0.6)
+        self.assertEqual(config.cooldown_sec, 5)
+
+    def test_edge_heartbeat_records_classes_and_returns_config(self):
+        response = self.client.post(self.EDGE_URL, {'available_classes': self.CLASSES}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['available_classes'], self.CLASSES)
+        self.assertTrue(response.data['edge_online'])
+        self.assertIn('conf_threshold', response.data)
+        self.assertIsNotNone(MonitorConfig.load().edge_last_seen)
+
+    def test_edge_heartbeat_without_classes_keeps_previous_classes(self):
+        self.client.post(self.EDGE_URL, {'available_classes': self.CLASSES}, format='json')
+        self.client.post(self.EDGE_URL, {}, format='json')
+        self.assertEqual(MonitorConfig.load().available_classes, self.CLASSES)
+
+    def test_edge_heartbeat_invalid_classes_returns_400(self):
+        response = self.client.post(self.EDGE_URL, {'available_classes': [1, 2]}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_edge_offline_after_15_seconds(self):
+        config = MonitorConfig.load()
+        config.edge_last_seen = timezone.now() - timedelta(seconds=16)
+        config.save()
+        response = self.client.get(self.CONFIG_URL)
+        self.assertFalse(response.data['edge_online'])
+        self.assertGreaterEqual(response.data['edge_seen_sec'], 16)

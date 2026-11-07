@@ -2,11 +2,14 @@ package com.example.photoviewer;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -67,6 +70,18 @@ public class MainActivity extends AppCompatActivity {
 
     TextView textView;
     View offlineBanner;
+    // ID 10 기능 A: Edge 상태 표시
+    View edgeStatusDot;
+    TextView edgeStatusText;
+    private static final long EDGE_STATUS_REFRESH_MS = 5000;
+    private final Handler edgeStatusHandler = new Handler(Looper.getMainLooper());
+    private final Runnable edgeStatusRefresher = new Runnable() {
+        @Override
+        public void run() {
+            new EdgeStatusTask().execute();
+            edgeStatusHandler.postDelayed(this, EDGE_STATUS_REFRESH_MS);
+        }
+    };
     EditText searchInput;
     ImageAdapter adapter;
 
@@ -111,6 +126,8 @@ public class MainActivity extends AppCompatActivity {
 
         textView = findViewById(R.id.textView);
         offlineBanner = findViewById(R.id.offlineBanner);
+        edgeStatusDot = findViewById(R.id.edgeStatusDot);
+        edgeStatusText = findViewById(R.id.edgeStatusText);
         searchInput = findViewById(R.id.searchInput);
         database = AppDatabase.getInstance(getApplicationContext());
 
@@ -161,6 +178,51 @@ public class MainActivity extends AppCompatActivity {
 
         requestNotificationPermissionIfNeeded();
         schedulePeriodicSync();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // 화면이 보이는 동안에만 Edge 상태를 5초마다 확인한다
+        edgeStatusHandler.post(edgeStatusRefresher);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        edgeStatusHandler.removeCallbacks(edgeStatusRefresher);
+    }
+
+    public void onClickMonitorSettings(View v) {
+        startActivity(new Intent(this, SettingsActivity.class));
+    }
+
+    /** ID 10 기능 A: /api_root/config/에서 Edge 접속 상태와 감시 ON/OFF를 받아 상단에 표시한다. */
+    private class EdgeStatusTask extends AsyncTask<Void, Void, JSONObject> {
+        @Override
+        protected JSONObject doInBackground(Void... voids) {
+            try {
+                return MonitorConfigApi.fetch();
+            } catch (MonitorConfigApi.ApiException e) {
+                Log.e(TAG, "감시 설정 조회 실패: " + e.getMessage());
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(JSONObject config) {
+            int color;
+            if (config == null) {
+                edgeStatusText.setText("Edge 상태를 확인할 수 없음");
+                color = R.color.pb_hint;
+            } else {
+                String monitor = config.optBoolean("enabled", true) ? "감시 ON" : "감시 OFF";
+                edgeStatusText.setText(MonitorConfigApi.describeEdge(config) + " · " + monitor);
+                color = config.optBoolean("edge_online") ? R.color.pb_online : R.color.pb_hint;
+            }
+            ViewCompat.setBackgroundTintList(edgeStatusDot,
+                    ColorStateList.valueOf(ContextCompat.getColor(MainActivity.this, color)));
+        }
     }
 
     /** Android 13(API 33)+에서는 Notification을 띄우려면 런타임 권한이 필요하다. */

@@ -5,12 +5,13 @@ Phase 단위로 진행하고, 각 Phase의 확인 항목을 실제로 수행한 
 
 순서 원칙: 강의 기본 흐름(ID 3~4)을 먼저 확보 → ID 10 기능(서버·YOLO 변경 포함)을 붙임 → **ID 5~9 최종 캡처는 기능 구현 후 한 번에** 찍는다.
 
-## 현재 상태 (2026-11-04)
+## 현재 상태 (2026-11-07)
 
 - `PhotoBlogServer/`, `PhotoViewer/`: 공통평가 01 코드 복사, Phase 0 베이스라인 확인 완료.
-- `YOLOv5/`: upstream `e128e59` clone, `.git` 제거, venv 설치, 웹캠 기본 실행·ID 3 캡처 완료 (Phase 1). `changedetection.py` 작성·`detect.py` 5곳 수정, ID 4 캡처 완료 (Phase 2). 웹캠 → 로컬 Django 연동 확인 완료 (Phase 3, `--conf-thres 0.5`). 다음: Phase 4
-- Git: `main` 브랜치, 최신 `2444fbf feat: add change detection and send YOLO results to Django` (YOLOv5 일반 파일 141개로 추적), `origin = git@github.com:Moon-Eavan/AI-Intrusion-Detection.git`
-- ID 10 기능 확정: A 원격 감시 설정, B 이벤트 클립 녹화 + 보관 정책 (`docs/EXTRA_FEATURES.md`, 설계 단계)
+- `YOLOv5/`: upstream `e128e59` clone, `.git` 제거, venv 설치, 웹캠 기본 실행·ID 3 캡처 완료 (Phase 1). `changedetection.py` 작성·`detect.py` 5곳 수정, ID 4 캡처 완료 (Phase 2). 웹캠 → 로컬 Django 연동 확인 완료 (Phase 3, `--conf-thres 0.5`). 기능 A 구현·웹캠 증빙 완료 (Phase 4). 다음: Phase 5
+- Git: `main` 브랜치, 최신 `1ccb5a8 docs: record Phase 3 webcam test results` (YOLOv5 일반 파일 141개로 추적), `origin = git@github.com:Moon-Eavan/AI-Intrusion-Detection.git`
+- ID 10 기능 확정: A 원격 감시 설정(구현됨), B 이벤트 클립 녹화 + 보관 정책(설계 단계) — `docs/EXTRA_FEATURES.md`
+- **`ApiConfig.BASE_URL`이 로컬 테스트용 `http://10.0.2.2:8000` 상태.** Phase 5(클립 재생)·Phase 6(ID 7)도 로컬이 필요해 유지하고, Phase 7 전에 Cloud로 되돌린다
 
 ## Phase 0 — 기존 코드 베이스라인 확인 ✅ (2026-11-02)
 
@@ -78,14 +79,25 @@ python detect.py --source 0     # ← ID 3 (사용자)
 - [x] 서버를 끈 상태에서도 검출 루프가 멈추지 않음 (Phase 2 샘플 이미지 테스트에서 확인: `전송 실패` 출력 후 계속)
 - [ ] (선택) 백업용으로 `api_root`, 목록 화면 캡처 — 현재 로컬 DB에 3차 실행 게시물 4건 (최종 캡처는 Phase 6)
 
-## Phase 4 — 기능 A: 원격 감시 설정 (ID 10)
+## Phase 4 — 기능 A: 원격 감시 설정 (ID 10) ✅ (2026-11-07)
 
-`docs/EXTRA_FEATURES.md` 기능 A.
+`docs/EXTRA_FEATURES.md` 기능 A (구현 내용·설계 변경·확인 결과 상세).
 
-- [ ] Django: `MonitorConfig` 모델·migration, `GET/PATCH /api_root/config/`, `POST /api_root/config/edge/`, 테스트
-- [ ] YOLOv5: 설정 polling 스레드, 클래스·신뢰도 필터, `enabled`, 쿨다운
-- [ ] Android: `SettingsActivity`, Edge 상태 표시
-- [ ] 증빙 시나리오 1~6 확인·캡처
+- [x] Django: `MonitorConfig` 모델·migration `0002`, `GET/PUT/PATCH /api_root/config/`, `POST /api_root/config/edge/`(응답 = 설정), 테스트 12개 추가 → **40개 OK**. 로컬 DB에 migration 적용(백업: scratchpad `db_backup_before_phase4.sqlite3`), 실행 중인 서버로 API 응답 확인
+- [x] YOLOv5: `monitorconfig.py`(5초 heartbeat 스레드), `detect.py` 필터 2줄, `changedetection.py` OFF·재등록 대기. 샘플 이미지 7개 시나리오 + 실행 중 설정 변경(5.1초 후 반영) 확인 (임시 서버 복사본, 포트 8765)
+- [x] Android: `SettingsActivity`, `MonitorConfigApi`, `MainActivity` Edge 상태 줄. `assembleDebug` 성공, 에뮬레이터에서 로드·저장(PUT)·온라인 표시 확인
+- [x] 웹캠 증빙 (2026-11-07, 로컬 서버 + 에뮬레이터, `detect.py --source 0` 임계값 옵션 없음). Claude가 detect.py·앱 조작, 사용자는 카메라 앞 동작
+  - 시작 직후(대상 전체, 0.5) 약 30초에 18건 — chair·toilet·cell phone 등 깜빡임 (이 환경에서는 0.5로도 부족 → 대상·대기시간 필요성)
+  - 1 대상 `person`만: 5건 모두 `person`, `cell phone` 0건, 사진에 사람 박스만
+  - 2 `cell phone` 추가: `cell phone` 등록됨(사진 `cell phone 0.71`). 단 휴대폰을 움직이자 6초에 9건
+  - 2-1 재등록 대기 30초(추가 시나리오): 같은 동작에 `cell phone` 1건, 7회 `재등록 대기 중 - cell phone 미등록`
+  - 3 감시 OFF: 0건, `감시 OFF - person/cell phone 미등록`, 앱 상단 "감시 OFF"
+  - 4 YOLO 종료: 약 20초 후 앱 "Edge 오프라인 · 20초 전"
+  - 에뮬레이터 quickboot 스냅샷에 예전 앱이 남아 있어 APK 재설치 필요했음(`-no-snapshot-save`로 설치가 저장 안 됨)
+- [x] 증빙 파일 모음: `../AI-Intrusion-Detection-docs/captures/phase4/` (앱 화면 5장 10-3, YOLO 콘솔 로그 10-2). 10-1 브라우저 캡처는 사용자
+- 증빙 후 서버 설정을 기본값(ON, 전체, 0.5, 대기 0)으로 복원
+- 시작 직후 오검출 게시물 18건 삭제(사용자 요청, 이미지 파일 포함, 백업 scratchpad `db_backup_before_delete_phase4.sqlite3`) → 로컬 DB 36건 (기존 16 + Phase 3 4건 + Phase 4 시나리오 16건)
+- [x] 10-1 `/api_root/config/` 브라우저 캡처 (사용자, 상단 설정 필드 부분)
 
 ## Phase 5 — 기능 B: 이벤트 클립 녹화 + 보관 정책 (ID 10)
 

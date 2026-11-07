@@ -259,6 +259,8 @@ def run(
 
                 # Write results
                 for *xyxy, conf, cls in reversed(det):
+                    if not cd.config.accept(names[int(cls)], float(conf)):  # added (ID 10 기능 A): 감시 대상·신뢰도 필터
+                        continue  # added (ID 10 기능 A)
                     detected[int(cls)] = 1  # added (Ch08 p.11)
                     c = int(cls)  # integer class
                     label = names[c]

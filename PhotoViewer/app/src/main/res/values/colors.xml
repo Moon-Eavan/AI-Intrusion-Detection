@@ -19,6 +19,8 @@
     <color name="pb_input_stroke_default">#FFD1D5DB</color>
     <color name="pb_favorite">#FFE11D48</color>
     <color name="pb_error">#FFDC2626</color>
+    <!-- Edge 온라인 표시 (ID 10 기능 A) -->
+    <color name="pb_online">#FF16A34A</color>
 
     <!-- 오프라인 모드 배너 -->
     <color name="pb_warning_bg">#FFFFF7E6</color>

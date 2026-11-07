@@ -2,11 +2,13 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
-from rest_framework import viewsets
+from rest_framework import generics, viewsets
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from .forms import PostForm
-from .models import Post
-from .serializers import PostSerializer
+from .models import MonitorConfig, Post
+from .serializers import MonitorConfigSerializer, PostSerializer, validate_class_list
 
 
 class BlogImages(viewsets.ModelViewSet):
@@ -34,6 +36,29 @@ class BlogImages(viewsets.ModelViewSet):
             # 전용 계정을 자동 생성한다 (로그인 불가능한 시스템 계정, 비밀번호 없음).
             author = User.objects.create_user(username='mobile_uploader')
         return author
+
+
+class MonitorConfigView(generics.RetrieveUpdateAPIView):
+    """GET/PUT/PATCH /api_root/config/ — Android가 설정을 바꾸고 Edge가 읽는다 (ID 10 기능 A).
+    Android HttpURLConnection은 PATCH를 지원하지 않아 앱은 PUT(전체 필드)으로 저장한다."""
+
+    serializer_class = MonitorConfigSerializer
+
+    def get_object(self):
+        return MonitorConfig.load()
+
+
+class EdgeHeartbeatView(APIView):
+    """POST /api_root/config/edge/ — Edge 접속 기록 + 모델 클래스 등록, 응답으로 현재 설정을 돌려준다."""
+
+    def post(self, request):
+        config = MonitorConfig.load()
+        classes = request.data.get('available_classes')
+        if classes is not None:
+            config.available_classes = validate_class_list(classes)
+        config.edge_last_seen = timezone.now()
+        config.save()
+        return Response(MonitorConfigSerializer(config).data)
 
 
 def post_list(request):

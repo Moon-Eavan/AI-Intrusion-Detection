@@ -1,8 +1,10 @@
 import os
 import cv2
 import pathlib
+import time
 import requests
 from datetime import datetime
+from monitorconfig import MonitorConfig  # 추가(ID 10 기능 A)
 
 
 class ChangeDetection:
@@ -17,6 +19,21 @@ class ChangeDetection:
         self.result_prev = [0 for i in range(len(names))]
         # 수정: 토큰 발급 요청 제거 (없는 URL이라 시작 시 404로 실패함)
         print('ChangeDetection: 서버', self.HOST)
+        # 추가(ID 10 기능 A): 원격 감시 설정, 클래스별 마지막 등록 시각
+        self.config = MonitorConfig(self.HOST, names)
+        self.last_sent = [0.0 for i in range(len(names))]
+
+    def allowed(self, names, i):
+        # 추가(ID 10 기능 A): 감시 OFF이거나 재등록 대기시간 안이면 등록하지 않는다 (검출 상태는 계속 갱신)
+        if not self.config.enabled:
+            print('ChangeDetection: 감시 OFF -', names[i], '미등록')
+            return False
+        now = time.time()
+        if now - self.last_sent[i] < self.config.cooldown_sec:
+            print('ChangeDetection: 재등록 대기 중 -', names[i], '미등록')
+            return False
+        self.last_sent[i] = now
+        return True
 
     def add(self, names, detected_current, save_dir, image):
         self.title = ''
@@ -24,7 +41,7 @@ class ChangeDetection:
         change_flag = 0  # 변화 감지 플래그
         i = 0
         while i < len(self.result_prev):
-            if self.result_prev[i] == 0 and detected_current[i] == 1:
+            if self.result_prev[i] == 0 and detected_current[i] == 1 and self.allowed(names, i):  # 수정(ID 10 기능 A)
                 change_flag = 1
                 self.title = names[i]
                 self.text += names[i] + ", "

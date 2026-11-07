@@ -1,6 +1,6 @@
 # 프로젝트 구조
 
-현재 저장소 기준이다. `YOLOv5/`의 ID 10 관련 파일은 구현 예정.
+현재 저장소 기준이다. ID 10 기능 A 파일은 구현됨, 기능 B 파일은 구현 예정.
 
 ## 1. 루트
 
@@ -29,13 +29,13 @@ PhotoBlogServer/
 │   ├── urls.py               # admin/ + blog.urls (+ DEBUG 시 media 서빙)
 │   ├── wsgi.py / asgi.py
 └── blog/
-    ├── models.py             # Post(author, title, text, created_date, published_date, image)
-    ├── serializers.py        # PostSerializer (author read_only, id 없음)
-    ├── views.py              # BlogImages(ModelViewSet) + 웹 목록/상세/작성/수정
-    ├── urls.py               # '', post/<pk>/, post/new/, post/<pk>/edit/, api_root/
+    ├── models.py             # Post(author, title, text, created_date, published_date, image), MonitorConfig(ID 10 A)
+    ├── serializers.py        # PostSerializer (author read_only, id 없음), MonitorConfigSerializer
+    ├── views.py              # BlogImages(ModelViewSet) + 웹 목록/상세/작성/수정, MonitorConfigView, EdgeHeartbeatView
+    ├── urls.py               # '', post/<pk>/, post/new/, post/<pk>/edit/, api_root/config/, api_root/config/edge/, api_root/
     ├── forms.py / admin.py / apps.py
-    ├── tests.py              # 28개 테스트 (API·웹·모델)
-    ├── migrations/
+    ├── tests.py              # 40개 테스트 (API·웹·모델 28 + 감시 설정 12)
+    ├── migrations/           # 0001_initial, 0002_monitorconfig
     ├── templates/blog/       # base, post_list, post_detail, post_edit
     └── static/blog/css/
 ```
@@ -59,25 +59,29 @@ PhotoViewer/app/src/main/
 ├── AndroidManifest.xml
 ├── java/com/example/photoviewer/
 │   ├── ApiConfig.java           # BASE_URL 단일 관리
-│   ├── MainActivity.java        # GET 동기화, RecyclerView, 검색·정렬·즐겨찾기·캐시, Worker 등록
+│   ├── MainActivity.java        # GET 동기화, RecyclerView, 검색·정렬·즐겨찾기·캐시, Worker 등록, Edge 상태 줄(ID 10 A)
 │   ├── UploadActivity.java      # Photo Picker + multipart POST
 │   ├── DetailActivity.java      # 게시물 상세
+│   ├── SettingsActivity.java    # ID 10 A: 원격 감시 설정 화면 (PUT /api_root/config/)
+│   ├── MonitorConfigApi.java    # ID 10 A: /api_root/config/ GET·PUT 공용, Edge 상태 문구
 │   ├── ImageAdapter.java        # RecyclerView 어댑터
 │   ├── ZoomableImageView.java   # 이미지 확대
 │   ├── model/PostItem.java      # 게시물 모델, 식별키 = created_date
 │   ├── database/                # Room: AppDatabase, Favorite*, PostCache*
 │   └── worker/PostSyncWorker.java  # WorkManager 신규 게시물 확인 + 알림
 └── res/
-    ├── layout/                  # activity_main, activity_detail, activity_upload, item_image
+    ├── layout/                  # activity_main, activity_detail, activity_upload, item_image, activity_settings, item_target_chip
     └── xml/network_security_config.xml  # 10.0.2.2, 127.0.0.1만 cleartext 허용
 ```
 
-`ApiConfig.BASE_URL` 하나만 바꾸면 `MainActivity`, `UploadActivity`, `PostSyncWorker`가 모두 따라간다.
+`ApiConfig.BASE_URL` 하나만 바꾸면 `MainActivity`, `UploadActivity`, `PostSyncWorker`, `MonitorConfigApi`가 모두 따라간다.
 
 | 대상 | BASE_URL |
 | --- | --- |
 | 에뮬레이터 → 로컬 Django | `http://10.0.2.2:8000` |
-| PythonAnywhere (현재 값) | `https://hoynola.pythonanywhere.com` |
+| PythonAnywhere (기본값) | `https://hoynola.pythonanywhere.com` |
+
+> 현재 작업 트리는 로컬 테스트용 `http://10.0.2.2:8000` 상태다 (Phase 7 전에 Cloud로 되돌림).
 
 ## 4. YOLOv5
 
@@ -85,9 +89,10 @@ upstream `ultralytics/yolov5` `e128e595e13c39faecaf2d5ccd3a14daeb2ff40a` (2026-1
 
 ```text
 YOLOv5/
-├── detect.py                # upstream + ChangeDetection 연동 5곳 추가 (`# added (Ch08 p.11)`)
-├── changedetection.py       # 0→1 변화 감지 + 이미지 저장(320×240) + POST /api_root/Post/
-├── (ID 10 모듈)             # (예정) 설정 polling, 클립 녹화·인코딩 — 파일 분리 방식은 구현 시 결정
+├── detect.py                # upstream + ChangeDetection 연동 5곳(`# added (Ch08 p.11)`) + 감시 필터 2줄(`# added (ID 10 기능 A)`)
+├── changedetection.py       # 0→1 변화 감지 + 이미지 저장(320×240) + POST /api_root/Post/, 감시 OFF·재등록 대기(ID 10 A)
+├── monitorconfig.py         # ID 10 A: 5초 heartbeat 스레드, 서버 설정 보관, 클래스·신뢰도 필터
+├── (ID 10 B 모듈)           # (예정) 클립 녹화·인코딩
 ├── .vscode/launch.json      # 강의자료 p.7 디버깅 설정 (upstream `.gitignore`의 `*.json`으로 Git 제외, 로컬 전용)
 ├── models/ utils/ data/     # upstream
 ├── requirements.txt         # upstream

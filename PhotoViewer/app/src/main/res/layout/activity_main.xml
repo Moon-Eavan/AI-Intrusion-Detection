@@ -70,6 +70,44 @@
                 app:iconTint="@color/pb_muted" />
         </LinearLayout>
 
+        <!-- ID 10 기능 A: YOLO Edge 접속 상태(5초마다 갱신) + 원격 감시 설정 화면 진입 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="@dimen/screen_padding"
+            android:paddingEnd="@dimen/space_sm">
+
+            <View
+                android:id="@+id/edgeStatusDot"
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:background="@drawable/bg_status_dot" />
+
+            <TextView
+                android:id="@+id/edgeStatusText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/space_sm"
+                android:layout_weight="1"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:text="@string/edge_status_loading"
+                android:textColor="@color/pb_text_secondary"
+                android:textSize="@dimen/text_status" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnMonitorSettings"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="40dp"
+                android:onClick="onClickMonitorSettings"
+                android:text="@string/action_monitor_settings"
+                android:textSize="13sp" />
+        </LinearLayout>
+
         <!-- 둥근 검색창 (TextInputEditText는 EditText를 상속하므로 MainActivity의 EditText 바인딩 그대로 동작) -->
         <com.google.android.material.textfield.TextInputLayout
             style="@style/PhotoBlog.SearchInput"

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SettingsActivity 감시 대상 클래스 칩 (MainActivity 필터 칩과 같은 스타일) -->
+<com.google.android.material.chip.Chip xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/PhotoBlog.Chip"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content" />
