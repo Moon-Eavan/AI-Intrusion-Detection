@@ -71,7 +71,7 @@ Android 앱에서 YOLO Edge의 감시 동작(ON/OFF, 감시 대상 클래스, �
 | 4 | YOLO 종료 | 약 20초 후 앱 "Edge 오프라인 · 20초 전" |
 
 신뢰도 0.5만으로도 이동하는 물체·배경 물체는 깜빡여 중복 등록되며, 대상 클래스와 재등록 대기시간을 함께 써야 한다는 것을 실측으로 확인했다.
-증빙 파일: `../AI-Intrusion-Detection-docs/captures/phase4/`
+증빙 파일: `../AI-Intrusion-Detection-docs/captures/공통평가02/`
 
 ### 도입 근거 (Phase 3 관측, 2026-11-04)
 
@@ -151,7 +151,7 @@ Android 앱에서 YOLO Edge의 감시 동작(ON/OFF, 감시 대상 클래스, �
 - Django 테스트 50개 OK (신규 10: 클립 업로드 URL, 클립 없는 업로드, mp4 외 400, `clip_expired` read-only, FIFO 만료 순서, 만료 파일 삭제, 상한 이하 유지, 게시물 삭제 시 파일 삭제, 웹 상세 video/만료 문구, 웹 목록 배지)
 - 테스트 영상: 클립 약 6초·6fps·H.264 yuv420p·faststart, 첫 3초가 감지 전 장면, 녹화 중 `tie` 병합
 - 웹캠 (상한 0.3MB로 임시 실행): 이벤트 6건 모두 클립(22~127KB), 녹화 중 `cell phone` 병합, 오래된 3건 만료(게시물·사진 유지), 앱 목록 배지·상세 재생·만료 화면 확인
-- 증빙 파일: `../AI-Intrusion-Detection-docs/captures/phase5/`
+- 증빙 파일: `../AI-Intrusion-Detection-docs/captures/공통평가02/`
 
 ### 한계 (보고서에 명시)
 

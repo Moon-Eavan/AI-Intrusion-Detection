@@ -58,9 +58,12 @@ class ChangeDetection:
         if change_flag == 1:
             self.text = self.text[:-2]  # 수정: 마지막 클래스 뒤의 ", " 제거 ("person, cell phone")
             if self.recorder.recording:
-                # 추가(ID 10 기능 B): 녹화 중 새로 나타난 클래스는 진행 중인 이벤트에 합친다
-                self.recorder.event['data']['text'] += ', ' + self.text
-                print('ChangeDetection: 녹화 중인 이벤트에 추가 -', self.text)
+                # 추가(ID 10 기능 B): 녹화 중 새로 나타난 클래스는 진행 중인 이벤트에 합친다 (이미 있는 클래스는 다시 붙이지 않음)
+                event_names = self.recorder.event['data']['text'].split(', ')
+                added = [name for name in self.text.split(', ') if name not in event_names]
+                if added:
+                    self.recorder.event['data']['text'] = ', '.join(event_names + added)
+                    print('ChangeDetection: 녹화 중인 이벤트에 추가 -', ', '.join(added))
             else:
                 self.send(save_dir, image)
 

@@ -1,7 +1,8 @@
 # 공통평가 02 수행 결과 보고서 — 작성 초안
 
 루트 `모바일웹서비스 프로젝트_공통평가 02_수행 결과 보고서.docx`에 옮겨 적기 위한 초안이다. Word 파일 작성은 사용자가 한다.
-증빙 파일 위치: `../AI-Intrusion-Detection-docs/captures/phase4~7/` (앱 화면·로그), 나머지는 사용자 캡처.
+증빙 파일 위치: `../AI-Intrusion-Detection-docs/captures/공통평가02/` — 파일 이름 앞부분(`ID05_…`, `ID10-2_3_…`)이 보고서 행 번호·삽입 순서다. `참고/`는 보고서에 넣지 않아도 되는 보조 자료.
+`.txt` 로그 `ID10-4_1_…`은 VS Code로 열어 캡처한 뒤 이미지로 넣는다(`ID10-2_1`은 터미널 캡처 `.png`).
 
 - 상단: 학번, 이름
 - 범례: ○ 적합, × 부적합, △ 점검제외, N/A 해당없음
@@ -11,15 +12,15 @@
 
 | ID | 완료여부 | 적/부 | 관련증빙 (캡처 + 한 줄 설명) |
 | --- | --- | --- | --- |
-| 1 | 완료 | ○ | 저장소 루트 캡처(Finder 또는 GitHub). `PhotoBlogServer/`(Django), `PhotoViewer/`(Android), `YOLOv5/`(Edge), 보고서 `.docx`. 공통평가 01(`Mobile-Webservice`)과 다른 저장소 |
+| 1 | 완료 | ○ | `ID01_폴더구조.jpg` — 저장소 루트(Finder). `PhotoBlogServer/`(Django), `PhotoViewer/`(Android), `YOLOv5/`(Edge), 보고서 `.docx`. 공통평가 01(`Mobile-Webservice`)과 다른 저장소 |
 | 2 | 완료 | ○ | https://github.com/Moon-Eavan/AI-Intrusion-Detection |
-| 3 | 완료 | ○ | 수정 전 원본 `detect.py --source 0` 실행 터미널 + 객체 인식 화면. YOLOv5 upstream `e128e59`, Python 3.9 venv |
-| 4 | 완료 | ○ | VS Code `changedetection.py`(`add`·`send`), `detect.py` 추가 5곳(`# added (Ch08 p.11)`). 강의 코드 대비 수정: 서버에 JWT가 없어 토큰 발급 제거, 서버 주소 환경변수(`PHOTOBLOG_HOST`), 시간대 포함 시각 전송, 파일 닫기·timeout·전송 실패 시 검출 계속 (`# 수정:` 주석) |
-| 5 | 완료 | ○ | `http://127.0.0.1:8000/api_root/Post/` — YOLO가 등록한 게시물(title = 검출 클래스, image URL) |
-| 6 | 완료 | ○ | `http://127.0.0.1:8000/` — YOLO 게시물 제목·이미지 목록 |
-| 7 | 완료 | ○ | Android 앱(로컬 서버 동기화, 최신순)에서 YOLO 전송 이미지 표시 — `phase6/ID7_앱_YOLO게시물_최신순.png` |
-| 8 | 완료 | ○ | `https://hoynola.pythonanywhere.com/api_root/Post/` — Cloud에 등록된 YOLO 게시물 |
-| 9 | 완료 | ○ | `https://hoynola.pythonanywhere.com/` — Cloud 목록·이미지 |
+| 3 | 완료 | ○ | 1. `ID03_1_원본detect실행_터미널.jpg` — 수정 전 원본 `detect.py --source 0` 실행(`1 person, 1 bottle`) 2. `ID03_2_객체인식_완료화면.jpg` — 바운딩 박스 인식 화면 (두 장은 같은 원본 캡처 `ID03_원본detect실행_객체인식.jpg`를 잘라 만듦). 연동 코드는 이 캡처 이후(ID 4)에 추가. YOLOv5 upstream `e128e59`, Python 3.9 venv |
+| 4 | 완료 | ○ | `ID04_1_changedetection_add_send.jpg`, `ID04_2_detect_연동5곳_diff.jpg` — VS Code `changedetection.py`(`add`·`send`), `detect.py` 추가 5곳(`# added (Ch08 p.11)`). 강의 코드 대비 수정: 서버에 JWT가 없어 토큰 발급 제거, 서버 주소 환경변수(`PHOTOBLOG_HOST`), 시간대 포함 시각 전송, 파일 닫기·timeout·전송 실패 시 검출 계속 (`# 수정:` 주석) |
+| 5 | 완료 | ○ | `ID05_로컬_api_root.jpg` — `http://127.0.0.1:8000/api_root/Post/` — YOLO가 등록한 게시물(title = 검출 클래스, image URL) |
+| 6 | 완료 | ○ | `ID06_로컬_목록이미지.jpg` — `http://127.0.0.1:8000/` — YOLO 게시물 제목·이미지 목록 |
+| 7 | 완료 | ○ | Android 앱(로컬 서버 동기화, 최신순)에서 YOLO 전송 이미지 표시 — `ID07_앱_YOLO게시물_최신순.png` |
+| 8 | 완료 | ○ | `ID08_Cloud_api_root.jpg` — `https://hoynola.pythonanywhere.com/api_root/Post/` — Cloud에 등록된 YOLO 게시물 |
+| 9 | 완료 | ○ | `ID09_Cloud_목록이미지.jpg` — `https://hoynola.pythonanywhere.com/` — Cloud 목록·이미지 |
 
 참고(설명란에 쓸 수 있는 실측): 강의 기본 임계값 0.25로 웹캠을 75초 실행하자 배경 오검출 깜빡임으로 게시물이 58건 생겨, 0.5 기준을 적용함(이후 ID 10 기능 A로 원격 조정).
 
@@ -43,7 +44,7 @@ ID 10 행에는 아래 두 기능 이름과 "서버/클라이언트로 나누어
   - Edge 온라인 여부(15초 이내 접속)와 "n초 전"은 서버 시각으로 계산
   - 도입 이유: 강의 기본 로직은 배경 오검출이 깜빡이면 같은 물체가 반복 등록됨(실측 75초 58건). 현장에서 코드를 고치지 않고 앱으로 조정하기 위함
   - PythonAnywhere 무료 계정은 서버→Edge 연결이 안 되므로 Edge가 polling
-- **증빙**: `/api_root/config/` 브라우저 화면(ID 10-1 캡처)
+- **증빙**: `ID10-1_서버_감시설정API.jpg` (`/api_root/config/` 브라우저 화면)
 
 ### 10-2. 원격 감시 설정 — 클라이언트(Edge·Android)
 
@@ -52,7 +53,7 @@ ID 10 행에는 아래 두 기능 이름과 "서버/클라이언트로 나누어
   - Edge(`monitorconfig.py`): 백그라운드 스레드가 5초마다 설정 수신. 대상 외 클래스·임계값 미만 검출은 무시(박스도 그리지 않음), 감시 OFF면 검출만 하고 등록 안 함, 같은 클래스는 대기시간 안에 다시 나타나도 등록 안 함. 서버 연결 실패 시 마지막 설정으로 검출 계속
   - Android: `SettingsActivity`(감시 ON/OFF 스위치, 신뢰도 슬라이더, 대기시간, 감시 대상 칩 80개) 저장 → PUT. 메인 상단 "● Edge 온라인 · n초 전 · 감시 ON"
   - 웹캠 결과: 대상 person만 → 휴대폰 미등록 / cell phone 추가 → 등록 / 휴대폰을 흔들면 6초에 9건 → 대기 30초 설정 후 1건 / 감시 OFF → 0건 / Edge 종료 → 약 20초 후 오프라인 표시
-- **증빙**: `phase4/10-3_1~5_*.png`(앱 설정·상태 화면), `phase4/10-2_YOLO_콘솔로그.txt`(VS Code로 열어 캡처: `설정 반영`, `감시 OFF - … 미등록`, `재등록 대기 중 - … 미등록`)
+- **증빙** (3장): `ID10-2_1_Edge_감시ONOFF로그.png`(2026-11-10 재촬영, 터미널 캡처: 감시 ON → `클립 생성`·`201` / 앱에서 OFF → `설정 반영 enabled=False`, 두 번 재등장해도 `감시 OFF - person 미등록` / 다시 ON → `클립 생성 6.0초`·`201`. 프레임별 검출 줄은 제외, 원문 `참고/ID10-2_Edge_감시ONOFF로그.txt`), `ID10-2_4_앱_설정_대기30초.png`(설정 화면), `ID10-2_5_앱_메인_온라인_감시OFF.png`(Edge 상태 표시). 나머지 `ID10-2_2·3·6`은 선택. 이전 설정 반영 로그(대상·대기시간 변경 포함)는 `참고/이전_ID10-2_1_…`
 
 ### 10-3. 이벤트 클립 저장 + 용량 기준 보관 정책 — 서버
 
@@ -63,7 +64,7 @@ ID 10 행에는 아래 두 기능 이름과 "서버/클라이언트로 나누어
   - 게시물 삭제 시 사진·클립 파일도 함께 삭제(Django 기본 동작은 파일을 남김)
   - 웹: 목록 "▶ 클립"/"클립 만료" 배지, 상세 페이지 영상 재생
   - 증빙 실행: 상한을 0.3MB로 낮춰 이벤트 6건 업로드 → 오래된 3건 만료, 3건 유지
-- **증빙**: 웹 목록 배지, 웹 상세 재생(`/post/154/`), "클립 만료됨"(`/post/149/`), API의 `clip` URL(`phase5/10-5_API_clip응답.json` 또는 ID 5 캡처)
+- **증빙**: `ID10-3_1_서버_클립테스트결과.png`(`python manage.py test blog.tests.PostClipTests -v 2` 10개 OK — 상한 초과 시 오래된 클립부터 만료·파일 삭제, 게시물 삭제 시 파일 삭제 등. 터미널 창 캡처, 원문 `참고/ID10-3_테스트결과_원문.txt`), `ID10-3_2_서버_API_클립_만료.png`(노트북 Chrome `http://127.0.0.1:8000/api_root/Post/` — 만료 3건 `clip: null`·`clip_expired: true` 다음에 정상 3건 `clip` URL·`false`), `ID10-3_3_웹_상세_클립재생.jpg`(웹 상세 영상 재생). 웹 목록 배지·만료 상세는 `참고/`. 설명에 "증빙을 위해 상한을 0.3MB로 낮춰 실행, 이벤트 6건 중 오래된 3건 클립 만료·게시물과 이미지는 유지" 한 줄 추가
 
 ### 10-4. 이벤트 클립 녹화·업로드·재생 — 클라이언트(Edge·Android)
 
@@ -72,7 +73,7 @@ ID 10 행에는 아래 두 기능 이름과 "서버/클라이언트로 나누어
   - Edge(`cliprecorder.py`): 최근 3초 프레임(박스 포함, 320×240)을 계속 보관 → 감지 시 3초 더 녹화 → 백그라운드 스레드에서 H.264 mp4 인코딩 후 사진과 함께 POST(검출 루프는 멈추지 않음). 녹화 중 새로 나타난 클래스는 같은 이벤트에 합침(예: `person, cell phone`)
   - 브라우저·Android 재생을 위해 H.264 + faststart 사용(OpenCV 기본 `mp4v`는 브라우저 재생 불가), 클립 1개 약 20~130KB
   - Android: 목록 클립 배지, 상세 화면 `VideoView` 반복 재생, 만료 시 안내 문구
-- **증빙**: `phase5/10-4_YOLO_클립로그.txt`(VS Code 캡처: `클립 녹화 시작`, `녹화 중인 이벤트에 추가`, `클립 생성 …KB`), `phase5/10-6_1~4_*.png`(앱 목록 배지·재생·만료), Cloud 재생 `phase7/Cloud_앱상세_클립재생.png`
+- **증빙**: `ID10-4_1_Edge_클립녹화로그.txt`(VS Code 캡처: `클립 녹화 시작`, `녹화 중인 이벤트에 추가`, `클립 생성 …KB`), `ID10-4_2_앱_목록_클립_클립만료.png`(한 화면에 "▶ 클립" 게시물과 "클립 만료" 게시물이 이어서 보임), `ID10-4_3_앱_상세_클립재생.png`(상세 화면 클립 재생). 만료 상세 화면 등 개별 캡처는 `참고/`. Cloud 재생은 `참고/Cloud_앱상세_클립재생.png`
 
 ### 한계 (보고서에 쓸 경우)
 

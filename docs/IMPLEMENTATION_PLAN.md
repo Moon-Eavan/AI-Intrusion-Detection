@@ -95,7 +95,7 @@ python detect.py --source 0     # ← ID 3 (사용자)
   - 3 감시 OFF: 0건, `감시 OFF - person/cell phone 미등록`, 앱 상단 "감시 OFF"
   - 4 YOLO 종료: 약 20초 후 앱 "Edge 오프라인 · 20초 전"
   - 에뮬레이터 quickboot 스냅샷에 예전 앱이 남아 있어 APK 재설치 필요했음(`-no-snapshot-save`로 설치가 저장 안 됨)
-- [x] 증빙 파일 모음: `../AI-Intrusion-Detection-docs/captures/phase4/` (앱 화면 5장 10-3, YOLO 콘솔 로그 10-2). 10-1 브라우저 캡처는 사용자
+- [x] 증빙 파일 모음: `../AI-Intrusion-Detection-docs/captures/공통평가02/` (앱 화면 5장 10-3, YOLO 콘솔 로그 10-2). 10-1 브라우저 캡처는 사용자
 - 증빙 후 서버 설정을 기본값(ON, 전체, 0.5, 대기 0)으로 복원
 - 시작 직후 오검출 게시물 18건 삭제(사용자 요청, 이미지 파일 포함, 백업 scratchpad `db_backup_before_delete_phase4.sqlite3`) → 로컬 DB 36건 (기존 16 + Phase 3 4건 + Phase 4 시나리오 16건)
 - [x] 10-1 `/api_root/config/` 브라우저 캡처 (사용자, 상단 설정 필드 부분)
@@ -113,15 +113,16 @@ python detect.py --source 0     # ← ID 3 (사용자)
   - 시작 직후 첫 이벤트는 버퍼가 비어 감지 전 구간 없이 3.1초 클립
   - 앱 동기화가 한 번 `Failed to connect`(일시적)로 오프라인 캐시 표시 → 재시도 시 정상
 - [x] 증빙 후 서버를 기본 상한(200MB)으로 재시작, 감시 설정 기본값 복원
-- [x] 증빙 파일: `../AI-Intrusion-Detection-docs/captures/phase5/` (YOLO 로그 10-4, API 응답 10-5, 앱 화면 4장 10-6). 웹 캡처 10-5는 사용자
+- [x] 증빙 파일: `../AI-Intrusion-Detection-docs/captures/공통평가02/` (YOLO 로그 10-4, API 응답 10-5, 앱 화면 4장 10-6). 웹 캡처 10-5는 사용자
 - [x] (Phase 5 커밋 후, 사용자 요청) 게시물 `text` 끝 쉼표 제거: `"person, "` → `"person"`, 녹화 중 병합은 `", "`로 연결. 테스트 영상으로 `'person, bus, tie'`, `'person, bus'` 확인
+- [x] (2026-11-10, 사용자 요청) 녹화 중 병합 시 이미 이벤트에 있는 클래스는 다시 붙이지 않음: 웹캠 ON/OFF 증빙 중 사람이 녹화 도중 깜빡여 `"person, person"`이 저장된 것을 발견 → `changedetection.py` 수정. 카메라 없이 시뮬레이션(person 깜빡임·cell phone 깜빡임)으로 `'person, cell phone'` 확인. 기존 로컬 게시물 1건(`person, person`)은 그대로
 
 ## Phase 6 — 로컬 최종 캡처 (ID 5·6·7) ✅ (2026-11-07)
 
 - [x] YOLO 실행해 새 검출 게시물 생성 (웹캠, 대상 person·cell phone, 대기 10초): 8건(`person` 7, `cell phone` 1), 모두 클립 포함, `text` 끝 쉼표 없는 새 형식. 로컬 DB 50건. 이후 감시 설정 기본값 복원
 - [x] `http://127.0.0.1:8000/api_root/Post/` 캡처 (ID 5) — 사용자 완료 (목록 끝부분에 2026-11-07 06:58~06:59 UTC 게시물)
 - [x] `http://127.0.0.1:8000/` 목록·이미지 캡처 (ID 6) — 사용자 완료 (맨 위 8건)
-- [x] Android(`BASE_URL = http://10.0.2.2:8000`, Phase 5 빌드) 동기화 → **최신순** → YOLO 게시물·클립 배지 캡처 (ID 7) — `../AI-Intrusion-Detection-docs/captures/phase6/ID7_앱_YOLO게시물_최신순.png`
+- [x] Android(`BASE_URL = http://10.0.2.2:8000`, Phase 5 빌드) 동기화 → **최신순** → YOLO 게시물·클립 배지 캡처 (ID 7) — `../AI-Intrusion-Detection-docs/captures/공통평가02/`
 - [x] 기존 Android 기능 회귀 확인 (에뮬레이터, adb 조작)
   - 동기화 50건 / 검색 "cell" → 14건 / 오래된순(2026-10-08 글)·최신순(오늘 YOLO 글) / 즐겨찾기 등록 → 필터 1개 → 해제
   - 업로드: Photo Picker로 사진 선택 + 제목·내용 → 서버에 이미지 포함 등록, 자동 재동기화 51건 → 테스트 게시물 삭제(파일도 삭제)
@@ -152,7 +153,7 @@ pip install -r requirements.txt && python manage.py migrate && python manage.py 
 - [x] `PHOTOBLOG_HOST=https://hoynola.pythonanywhere.com`으로 YOLO 실행(Cloud 설정 person·cell phone, 대기 10초) → 6건(`person` 4, `cell phone` 2) 클립 포함 등록, Cloud 게시물 15건. 종료 직전 녹화 중이던 1건은 업로드 전 종료로 유실
   - Cloud 클립 `video/mp4` 200. PA static 서버는 Range 요청에 206이 아닌 200 전체 응답 → faststart로 Chrome·Android 재생 가능, Safari는 재생 안 될 수 있음
 - [x] Android `BASE_URL` Cloud로 복원·재빌드 → 동기화 15건, 클립 배지, 상세 클립 재생(00:05/00:06), 감시 설정 화면(대상 2개·대기 10 로드), Edge 상태 표시 확인. 이후 Cloud 감시 설정 기본값 복원
-- [x] 증빙 파일: `../AI-Intrusion-Detection-docs/captures/phase7/` (Cloud 앱 목록·클립 재생·감시 설정)
+- [x] 증빙 파일: `../AI-Intrusion-Detection-docs/captures/공통평가02/` (Cloud 앱 목록·클립 재생·감시 설정)
 - [x] Cloud `api_root` 캡처 (ID 8), 웹 목록·이미지 캡처 (ID 9) — 사용자 완료
 - [x] 커밋 `f41162c` push 후 PA에서 `git pull` + Reload (사용자) → 외부 재확인: 페이지·API·설정 API·CSS 200, 클립 `video/mp4` 200, 게시물 15건, 404 정상
 - [ ] (선택) Cloud `media/` 사용량: PA 콘솔에서 `du -sh ~/AI-Intrusion-Detection/PhotoBlogServer/media` (이번 클립 6개 약 0.5MB, 상한 200MB)
@@ -160,7 +161,8 @@ pip install -r requirements.txt && python manage.py migrate && python manage.py 
 ## Phase 8 — 제출 (ID 1·2)
 
 - [x] 루트에 `PhotoBlogServer/`, `PhotoViewer/`, `YOLOv5/`, 보고서 `.docx` 확인 (2026-11-07, 그 외 `docs/`, `tools/`, `README.md`, `CLAUDE.md`, `.gitignore`)
-- [ ] 폴더 구조 캡처 (ID 1) — 사용자 (Finder 또는 GitHub 루트)
+- [x] 폴더 구조 캡처 (ID 1) — 사용자 (Finder)
+- [x] 캡처 정리: 사용자 캡처 12장 내용 확인 후 Claude 저장분과 함께 `../AI-Intrusion-Detection-docs/captures/공통평가02/`에 보고서 행 번호 이름(`ID05_…`, `ID10-3_2_…`)으로 이동·이름 변경, 보조 자료는 `참고/`, 빈 `phase4~7/` 폴더 삭제. `ID06`과 `ID10-3_1`은 같은 화면(웹 목록·클립 배지)
 - [x] 추적 파일·전체 히스토리 점검: `db.sqlite3`·`media/`·`runs/`·`*.pt`·`venv/`·`.env`·`*.mp4`·`local.properties` 없음, 실제 비밀키 없음(히스토리의 `password = 'password'`는 `docs/ch08.md` 강의 예제 원문, 테스트용 `unused-pw`, upstream YOLOv5 CI의 `secrets.*` 참조뿐). 추적 이미지는 upstream 샘플 `bus.jpg`·`zidane.jpg`만. 259개 파일
 - [x] GitHub 확인 (API): 루트 구조 일치, `YOLOv5/`는 일반 폴더(tree, gitlink 아님)이고 `detect.py`·`changedetection.py`·`monitorconfig.py`·`cliprecorder.py` 포함
 - [x] 보고서 양식 확인: 표는 ID 1~10 + 빈 행 4개, 아직 미작성 → ID 10을 기능 × 서버/클라이언트 4행으로 쓰기로 정리, 초안 `docs/REPORT_DRAFT.md` 작성
