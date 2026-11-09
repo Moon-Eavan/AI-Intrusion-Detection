@@ -5,11 +5,11 @@ Phase 단위로 진행하고, 각 Phase의 확인 항목을 실제로 수행한 
 
 순서 원칙: 강의 기본 흐름(ID 3~4)을 먼저 확보 → ID 10 기능(서버·YOLO 변경 포함)을 붙임 → **ID 5~9 최종 캡처는 기능 구현 후 한 번에** 찍는다.
 
-## 현재 상태 (2026-11-07)
+## 현재 상태 (2026-11-10)
 
 - `PhotoBlogServer/`, `PhotoViewer/`: 공통평가 01 코드 복사, Phase 0 베이스라인 확인 완료.
-- `YOLOv5/`: upstream `e128e59` clone, `.git` 제거, venv 설치, 웹캠 기본 실행·ID 3 캡처 완료 (Phase 1). `changedetection.py` 작성·`detect.py` 5곳 수정, ID 4 캡처 완료 (Phase 2). 웹캠 → 로컬 Django 연동 확인 완료 (Phase 3, `--conf-thres 0.5`). 기능 A 구현·웹캠 증빙 완료 (Phase 4). 기능 B 구현·웹캠 증빙 완료 (Phase 5). Phase 6 로컬 최종 게시물 생성·ID 7·회귀 확인 완료. Phase 7 PythonAnywhere 배포·Cloud YOLO 게시물·Android Cloud 확인·ID 8·9 캡처 완료. Phase 8 저장소 점검·보고서 초안 완료, 보고서 작성·ID 1 캡처·최종 push는 사용자
-- Git: `main` 브랜치, 최신 `f41162c chore: deploy to PythonAnywhere and restore cloud BASE_URL` (origin과 동일, PA도 같은 커밋) (YOLOv5 일반 파일 141개로 추적), `origin = git@github.com:Moon-Eavan/AI-Intrusion-Detection.git`
+- `YOLOv5/`: upstream `e128e59` clone, `.git` 제거, venv 설치, 웹캠 기본 실행·ID 3 캡처 완료 (Phase 1). `changedetection.py` 작성·`detect.py` 5곳 수정, ID 4 캡처 완료 (Phase 2). 웹캠 → 로컬 Django 연동 확인 완료 (Phase 3, `--conf-thres 0.5`). 기능 A 구현·웹캠 증빙 완료 (Phase 4). 기능 B 구현·웹캠 증빙 완료 (Phase 5). Phase 6 로컬 최종 게시물 생성·ID 7·회귀 확인 완료. Phase 7 PythonAnywhere 배포·Cloud YOLO 게시물·Android Cloud 확인·ID 8·9 캡처 완료. Phase 8 저장소 점검·보고서 초안·ID 10 증빙 재구성 완료, 보고서 작성·push(사용자, `c408e81`). 남은 것: 보고서 완료 여부·적/부 기입 후 최종 push, URL 제출
+- Git: `main` 브랜치, 최신 `c408e81 공통평가02 보고서 작성 완료` (origin과 동일). PA는 `f41162c` 그대로 — 이후 변경은 Edge 코드(`changedetection.py`)·문서·보고서뿐이라 재배포 불필요 (YOLOv5 일반 파일 141개로 추적), `origin = git@github.com:Moon-Eavan/AI-Intrusion-Detection.git`
 - ID 10 기능 확정: A 원격 감시 설정(구현됨), B 이벤트 클립 녹화 + 보관 정책(구현됨) — `docs/EXTRA_FEATURES.md`
 - `ApiConfig.BASE_URL` = Cloud(`https://hoynola.pythonanywhere.com`)로 복원 (Phase 7). 로컬 테스트 때만 `http://10.0.2.2:8000`
 - PythonAnywhere: `/home/hoynola/AI-Intrusion-Detection/PhotoBlogServer`에서 이 저장소 코드로 동작, `DEBUG=False`, 새 `SECRET_KEY`(WSGI 파일 환경변수). 이전 `~/Mobile-Webservice`는 되돌리기용으로 남겨 둠
@@ -166,6 +166,9 @@ pip install -r requirements.txt && python manage.py migrate && python manage.py 
 - [x] 추적 파일·전체 히스토리 점검: `db.sqlite3`·`media/`·`runs/`·`*.pt`·`venv/`·`.env`·`*.mp4`·`local.properties` 없음, 실제 비밀키 없음(히스토리의 `password = 'password'`는 `docs/ch08.md` 강의 예제 원문, 테스트용 `unused-pw`, upstream YOLOv5 CI의 `secrets.*` 참조뿐). 추적 이미지는 upstream 샘플 `bus.jpg`·`zidane.jpg`만. 259개 파일
 - [x] GitHub 확인 (API): 루트 구조 일치, `YOLOv5/`는 일반 폴더(tree, gitlink 아님)이고 `detect.py`·`changedetection.py`·`monitorconfig.py`·`cliprecorder.py` 포함
 - [x] 보고서 양식 확인: 표는 ID 1~10 + 빈 행 4개, 아직 미작성 → ID 10을 기능 × 서버/클라이언트 4행으로 쓰기로 정리, 초안 `docs/REPORT_DRAFT.md` 작성
-- [ ] Word 보고서 작성(학번·이름, 완료 여부, 적/부, 캡처 내장, ID 10 4행) — 사용자
-- [ ] 보고서 `.docx` 최종본 커밋·push, GitHub에서 재확인
+- [x] ID 10 증빙 재구성 (2026-11-09~10, 사용자 요청): 10-2 사진 1을 웹캠 감시 ON→OFF→ON 로그(터미널 캡처)로 교체, 10-3을 서버 테스트 결과·API 만료 화면·웹 재생 3장으로 교체, 10-4 앱 목록을 클립·만료 한 화면으로 합침. 각 행 3장(10-1은 1장), 이전 사진은 `참고/`
+- [x] Word 보고서 작성(학번·이름, 캡처 내장, ID 10 4행 정의·설명·관련증빙) — 사용자. Claude 점검(2026-11-10): 행별 사진 19장 순서·내용 일치, 원본 해상도로 재삽입 확인
+- [x] 보고서 커밋·push — 사용자 (`99230ef`, `c408e81`)
+- [ ] 보고서 마무리 — 보고서 저장본(11-10 00:41, `c408e81`)은 완료 여부·적/부 칸, ID 10 상위 행 증빙, 10-1 사진 설명의 "Edge 접속 상태" 수정이 아직 반영 안 됨 → 사용자가 Word에서 고쳐 저장 후 다시 커밋·push
+- [ ] 최종본 push 후 GitHub에서 재확인
 - [ ] GitHub URL 제출
