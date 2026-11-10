@@ -9,7 +9,7 @@ Phase 단위로 진행하고, 각 Phase의 확인 항목을 실제로 수행한 
 
 - `PhotoBlogServer/`, `PhotoViewer/`: 공통평가 01 코드 복사, Phase 0 베이스라인 확인 완료.
 - `YOLOv5/`: upstream `e128e59` clone, `.git` 제거, venv 설치, 웹캠 기본 실행·ID 3 캡처 완료 (Phase 1). `changedetection.py` 작성·`detect.py` 5곳 수정, ID 4 캡처 완료 (Phase 2). 웹캠 → 로컬 Django 연동 확인 완료 (Phase 3, `--conf-thres 0.5`). 기능 A 구현·웹캠 증빙 완료 (Phase 4). 기능 B 구현·웹캠 증빙 완료 (Phase 5). Phase 6 로컬 최종 게시물 생성·ID 7·회귀 확인 완료. Phase 7 PythonAnywhere 배포·Cloud YOLO 게시물·Android Cloud 확인·ID 8·9 캡처 완료. Phase 8 저장소 점검·보고서 초안·ID 10 증빙 재구성 완료, 보고서 작성·push 완료(사용자). 남은 것: URL 제출
-- Git: `main` 브랜치, 최신 `af5afca chore: untrack Word lock file and ignore ~$* files` (origin과 동일). PA는 `f41162c` 그대로 — 이후 변경은 Edge 코드(`changedetection.py`)·문서·보고서뿐이라 재배포 불필요 (YOLOv5 일반 파일 141개로 추적), `origin = git@github.com:Moon-Eavan/AI-Intrusion-Detection.git`
+- Git: `main` 브랜치, 최신 `8c479ca docs: mark Phase 8 complete` (origin과 동일). PA는 `f41162c` 그대로 — 이후 변경은 Edge 코드(`changedetection.py`)·문서·보고서뿐이라 재배포 불필요 (YOLOv5 일반 파일 141개로 추적), `origin = git@github.com:Moon-Eavan/AI-Intrusion-Detection.git`
 - ID 10 기능 확정: A 원격 감시 설정(구현됨), B 이벤트 클립 녹화 + 보관 정책(구현됨) — `docs/EXTRA_FEATURES.md`
 - `ApiConfig.BASE_URL` = Cloud(`https://hoynola.pythonanywhere.com`)로 복원 (Phase 7). 로컬 테스트 때만 `http://10.0.2.2:8000`
 - PythonAnywhere: `/home/hoynola/AI-Intrusion-Detection/PhotoBlogServer`에서 이 저장소 코드로 동작, `DEBUG=False`, 새 `SECRET_KEY`(WSGI 파일 환경변수). 이전 `~/Mobile-Webservice`는 되돌리기용으로 남겨 둠
@@ -170,5 +170,7 @@ pip install -r requirements.txt && python manage.py migrate && python manage.py 
 - [x] Word 보고서 작성(학번·이름, 캡처 내장, ID 10 4행 정의·설명·관련증빙) — 사용자. Claude 점검(2026-11-10): 행별 사진 19장 순서·내용 일치, 원본 해상도로 재삽입 확인
 - [x] 보고서 커밋·push — 사용자 (`99230ef`, `c408e81`)
 - [x] 보고서 마무리 — 보고서 작성·push 완료(사용자). 적/부 판정 칸은 교수가 채우므로 비워 제출, 10-1~10-4 문구는 사용자 작성본 그대로 (`5db0db7`)
+- [x] (2026-11-10) 교수 안내로 ID 10을 기능당 1행(10-1 원격 감시 설정 4장, 10-2 이벤트 클립·보관 정책 5장)으로 합침 — 문구 `docs/REPORT_DRAFT.md`(서버/클라이언트 구분 없이 서술), Word 수정은 사용자. Claude 점검: 10-3·10-4 행 삭제, 행별 사진 순서·내용 일치 확인
+- [ ] 수정된 보고서·문서 커밋·push — 사용자
 - [x] Word 잠금 파일(`~$…docx`)이 `ecea326`에 함께 올라가 추적 해제, `.gitignore`에 `~$*` 추가 — 사용자 커밋 `af5afca`, push 확인(origin과 동일)
 - [ ] GitHub URL 제출

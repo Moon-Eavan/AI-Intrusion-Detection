@@ -119,5 +119,5 @@ YOLOv5/
 | `docs/EXTRA_FEATURES.md` | ID 10 기능 A(원격 감시 설정)·B(이벤트 클립 녹화) 설계·구현·확인 결과 |
 | `docs/ANDROID_FEATURES.md` | Android 기존 기능, ID 10 Android 변경 범위 |
 | `docs/REPORT_CHECKLIST.md` | 평가 ID별 캡처·보고서 체크리스트 |
-| `docs/REPORT_DRAFT.md` | Word 보고서 행별 작성 초안 (ID 1~10, ID 10은 4행) |
+| `docs/REPORT_DRAFT.md` | Word 보고서 행별 작성 초안 (ID 1~10, ID 10은 기능당 1행 = 2행) |
 | `docs/ch08.md` | Ch08 강의자료 정리본 |

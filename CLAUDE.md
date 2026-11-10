@@ -10,7 +10,7 @@
 
 ## 현재 상태 (2026-11-10)
 
-- Phase 0 완료(Django 테스트 28 OK, Android 빌드·에뮬레이터 Cloud 동기화 확인), Phase 1 완료(YOLOv5 `e128e59`, ID 3 캡처), Phase 2 완료(`changedetection.py`, `detect.py` +7줄, ID 4 캡처), Phase 3 완료(웹캠 → 로컬 Django, `--conf-thres 0.5`로 중복 없음 확인), Phase 4 완료(기능 A, 웹캠 증빙), Phase 5 완료(기능 B, Django 테스트 50 OK, 웹캠 증빙), Phase 6 완료(로컬 최종 게시물·ID 7·Android 회귀), Phase 7 완료(PA 배포·Cloud YOLO 게시물·Android Cloud 확인·ID 8·9 캡처), Phase 8 완료(저장소 점검·보고서 초안·ID 10 증빙 재구성, 보고서 작성·push 완료(사용자). 적/부 판정 칸은 교수가 채우므로 비워 제출, 10-1~10-4 문구는 사용자 작성본 그대로). **과제 작업 종료**, 남은 것은 GitHub URL 제출(사용자). `origin = Moon-Eavan/AI-Intrusion-Detection` (최신 커밋 `af5afca`, origin과 동일. Word 잠금 파일 `~$*`는 `.gitignore`. PA는 `f41162c` — 이후 변경은 Edge 코드·문서·보고서뿐이라 재배포 불필요)
+- Phase 0 완료(Django 테스트 28 OK, Android 빌드·에뮬레이터 Cloud 동기화 확인), Phase 1 완료(YOLOv5 `e128e59`, ID 3 캡처), Phase 2 완료(`changedetection.py`, `detect.py` +7줄, ID 4 캡처), Phase 3 완료(웹캠 → 로컬 Django, `--conf-thres 0.5`로 중복 없음 확인), Phase 4 완료(기능 A, 웹캠 증빙), Phase 5 완료(기능 B, Django 테스트 50 OK, 웹캠 증빙), Phase 6 완료(로컬 최종 게시물·ID 7·Android 회귀), Phase 7 완료(PA 배포·Cloud YOLO 게시물·Android Cloud 확인·ID 8·9 캡처), Phase 8 완료(저장소 점검·보고서 초안·ID 10 증빙 재구성, 보고서 작성·push 완료(사용자). 적/부 판정 칸은 교수가 채우므로 비워 제출). 2026-11-10 교수 안내로 ID 10을 기능당 1행(10-1·10-2)으로 합쳐 보고서 수정 완료(점검함) — 커밋·push 후 GitHub URL 제출(사용자). `origin = Moon-Eavan/AI-Intrusion-Detection` (최신 커밋 `8c479ca`, origin과 동일. Word 잠금 파일 `~$*`는 `.gitignore`. PA는 `f41162c` — 이후 변경은 Edge 코드·문서·보고서뿐이라 재배포 불필요)
 - `ApiConfig.BASE_URL`: 기본 `https://hoynola.pythonanywhere.com`, 로컬 에뮬레이터는 이 한 줄만 `http://10.0.2.2:8000`. 현재 Cloud 상태
 - ID 10 편의 기능 확정: A 원격 감시 설정(구현됨), B 이벤트 클립 녹화 + 보관 정책(구현됨) — `docs/EXTRA_FEATURES.md`. 이 외 기능을 임의로 추가하지 않는다
 - 진행 상황은 `docs/IMPLEMENTATION_PLAN.md`의 체크박스로 관리한다
